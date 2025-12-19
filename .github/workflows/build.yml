@@ -26,22 +26,7 @@ jobs:
     
     - name: Build EXE
       run: |
-        pyinstaller --noconfirm --onefile --windowed ^
-          --name "BUP_Yonetim" ^
-          --icon "assets/icon.ico" ^
-          --add-data "shared;shared" ^
-          --add-data "ISKONTO_HESABI;ISKONTO_HESABI" ^
-          --add-data "KARLILIK_ANALIZI;KARLILIK_ANALIZI" ^
-          --add-data "Musteri_Sayisi_Kontrolu;Musteri_Sayisi_Kontrolu" ^
-          --add-data "YASLANDIRMA;YASLANDIRMA" ^
-          --hidden-import customtkinter ^
-          --hidden-import PIL ^
-          --hidden-import pandas ^
-          --hidden-import openpyxl ^
-          --hidden-import matplotlib ^
-          --hidden-import pdfplumber ^
-          --collect-data customtkinter ^
-          main.py
+        pyinstaller --noconfirm --onefile --windowed --name "BUP_Yonetim" --add-data "shared;shared" --add-data "ISKONTO_HESABI;ISKONTO_HESABI" --add-data "KARLILIK_ANALIZI;KARLILIK_ANALIZI" --add-data "Musteri_Sayisi_Kontrolu;Musteri_Sayisi_Kontrolu" --add-data "YASLANDIRMA;YASLANDIRMA" --hidden-import customtkinter --hidden-import PIL --hidden-import pandas --hidden-import openpyxl --hidden-import matplotlib --hidden-import pdfplumber --collect-data customtkinter main.py
       shell: cmd
     
     - name: Upload EXE
