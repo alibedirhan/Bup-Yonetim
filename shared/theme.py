@@ -4,7 +4,16 @@ BUP-ALL-IN-ONE Ortak Tema Modülü
 Tüm alt programlarda tutarlı görünüm için merkezi tema yönetimi
 """
 
+# Windows/Tk: 'bad screen distance "200.0"' benzeri hataları engelle
+try:
+    from .utils import apply_tk_float_fix, setup_turkish_locale
+    apply_tk_float_fix()
+    setup_turkish_locale()
+except Exception:
+    pass
+
 import customtkinter as ctk
+
 from typing import Dict, Any
 import platform
 

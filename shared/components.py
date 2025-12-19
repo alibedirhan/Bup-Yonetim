@@ -4,7 +4,16 @@ BUP-ALL-IN-ONE Ortak UI Bileşenleri
 Tüm modüllerde kullanılan ortak widget'lar ve UI fonksiyonları
 """
 
+# Windows/Tk: 'bad screen distance "200.0"' benzeri hataları engelle
+try:
+    from .utils import apply_tk_float_fix, setup_turkish_locale
+    apply_tk_float_fix()
+    setup_turkish_locale()
+except Exception:
+    pass
+
 import customtkinter as ctk
+
 from typing import Callable, Optional, List, Dict, Any
 from pathlib import Path
 import tkinter as tk

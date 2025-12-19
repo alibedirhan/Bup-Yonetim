@@ -4,7 +4,6 @@ BUP-ALL-IN-ONE Ana Program
 Tüm modülleri birleştiren modern arayüz - v3.1
 """
 
-import customtkinter as ctk
 import sys
 import os
 from pathlib import Path
@@ -23,17 +22,26 @@ GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 BASE_DIR = Path(__file__).parent
 sys.path.insert(0, str(BASE_DIR))
 
+# Uygulama genel fix'leri (Tk float/locale + logging + crash hook)
+from shared.utils import initialize_app
+logger = initialize_app("BUP_MAIN")
+
+import customtkinter as ctk
+
 # Shared modüller
 from shared.theme import COLORS, MODULE_COLORS, FONTS, SIZES
-from shared.utils import initialize_app, setup_turkish_locale
 from shared.components import show_error
-
-# Logger başlat
-logger = initialize_app("BUP_MAIN")
 
 # CTK ayarları
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
+
+# Windows DPI/scaling bazen float üretip Tk'yi bozabiliyor -> sabitle
+try:
+    ctk.set_widget_scaling(1.0)
+    ctk.set_window_scaling(1.0)
+except Exception:
+    pass
 
 
 def check_for_updates():
@@ -875,8 +883,6 @@ class BupilicMainApp(ctk.CTk):
 
 def main():
     """Ana fonksiyon"""
-    setup_turkish_locale()
-    
     app = BupilicMainApp()
     app.mainloop()
 

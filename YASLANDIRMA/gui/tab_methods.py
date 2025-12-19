@@ -14,7 +14,38 @@ _parent_dir = _current_dir.parent
 if str(_parent_dir) not in sys.path:
     sys.path.insert(0, str(_parent_dir))
 
+# Windows/Tk: 'bad screen distance "200.0"' benzeri hataları engelle
+import os as _os, sys as _sys
+
+def _ensure_project_root():
+    cur = _os.path.abspath(_os.path.dirname(__file__))
+    for _ in range(6):
+        if _os.path.isdir(_os.path.join(cur, "shared")):
+            if cur not in _sys.path:
+                _sys.path.insert(0, cur)
+            return
+        parent = _os.path.dirname(cur)
+        if parent == cur:
+            return
+        cur = parent
+
+try:
+    _ensure_project_root()
+    from shared.utils import apply_tk_float_fix as _apply_tk_float_fix, setup_turkish_locale as _setup_turkish_locale
+    _apply_tk_float_fix()
+    _setup_turkish_locale()
+except Exception:
+    pass
+
 import customtkinter as ctk
+
+# CustomTkinter DPI/scaling bazen float üretebiliyor -> sabitle
+try:
+    ctk.set_widget_scaling(1.0)
+    ctk.set_window_scaling(1.0)
+except Exception:
+    pass
+
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import pandas as pd

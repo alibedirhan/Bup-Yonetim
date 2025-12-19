@@ -84,32 +84,34 @@ def setup_logging(
     backup_count: int = 3
 ) -> logging.Logger:
     """
-    Modül için logging sistemi kur
-    
+    Modül için logging sistemi kur.
+
     Args:
         module_name: Log dosyası için modül adı
         log_level: Minimum log seviyesi
         max_bytes: Maksimum log dosyası boyutu
         backup_count: Yedek dosya sayısı
-    
+
     Returns:
         Logger instance
     """
-    # Logger oluştur
     logger = logging.getLogger(module_name)
-    
-    # Zaten handler varsa ekleme
+
+    # Seviyeyi her zaman ayarla
+    logger.setLevel(log_level)
+
+    # Root logger'a akmasın; aksi halde çift log görürsün
+    logger.propagate = False
+
+    # Daha önce handler eklendiyse tekrar ekleme
     if logger.handlers:
         return logger
-    
-    logger.setLevel(log_level)
-    
-    # Format
+
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    
+
     # Dosya handler
     log_file = get_logs_dir() / f"{module_name}_{datetime.now().strftime('%Y%m%d')}.log"
     file_handler = RotatingFileHandler(
@@ -120,15 +122,86 @@ def setup_logging(
     )
     file_handler.setLevel(log_level)
     file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    
+
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
     console_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
     logger.addHandler(console_handler)
-    
+
     return logger
+
+# ============================================================================
+# GLOBAL EXCEPTION HOOK (EXE'de sessiz crash olmasın)
+# ============================================================================
+
+def install_exception_hooks(logger: Optional[logging.Logger] = None) -> None:
+    """Tüm yakalanmayan hataları crash.log dosyasına yaz ve (varsa) logger'a geçir.
+
+    Not: Bu fonksiyon yalnızca hook kurar; logger handler/level kurmaz.
+    Logging kurulumu setup_logging() ile yapılmalıdır.
+    """
+    import traceback
+
+    crash_file = get_logs_dir() / "crash.log"
+
+    # Logger yoksa en azından adlandırılmış bir logger kullan (handler eklemiyoruz).
+    if logger is None:
+        logger = logging.getLogger("BUP_CRASH")
+
+    def _write(exc_type, exc, tb):
+        try:
+            text = "".join(traceback.format_exception(exc_type, exc, tb))
+        except Exception:
+            text = f"{exc_type}: {exc}"
+
+        # crash.log'a yaz
+        try:
+            crash_file.parent.mkdir(parents=True, exist_ok=True)
+            with crash_file.open("a", encoding="utf-8") as f:
+                f.write("\n" + "=" * 80 + "\n")
+                f.write(datetime.now().isoformat(sep=" ", timespec="seconds") + "\n")
+                f.write(text + "\n")
+        except Exception:
+            pass
+
+        # logger'a da düşür
+        try:
+            logger.error("Unhandled exception", exc_info=(exc_type, exc, tb))
+        except Exception:
+            pass
+
+    # Orijinal hook'u sakla ki frozen değilken terminale traceback da basabilelim
+    _orig_sys_hook = sys.excepthook
+
+    def _sys_hook(exc_type, exc, tb):
+        _write(exc_type, exc, tb)
+        if not is_frozen() and callable(_orig_sys_hook):
+            try:
+                _orig_sys_hook(exc_type, exc, tb)
+            except Exception:
+                pass
+
+    sys.excepthook = _sys_hook
+
+    # Thread exceptions (Py3.8+)
+    try:
+        import threading
+        _orig_thread_hook = getattr(threading, 'excepthook', None)
+
+        def _thread_hook(args):
+            _write(args.exc_type, args.exc_value, args.exc_traceback)
+            if not is_frozen() and callable(_orig_thread_hook):
+                try:
+                    _orig_thread_hook(args)
+                except Exception:
+                    pass
+
+        threading.excepthook = _thread_hook  # type: ignore[attr-defined]
+    except Exception:
+        pass
 
 # ============================================================================
 # LOCALE VE TÜRKÇE KARAKTER DESTEĞİ
@@ -347,6 +420,9 @@ def initialize_app(module_name: str) -> logging.Logger:
     # Logging kur
     logger = setup_logging(module_name)
     
+    # Global exception hook (crash.log)
+    install_exception_hooks(logger)
+
     # Bilgilendirme
     logger.info("=" * 60)
     logger.info(f"{module_name} başlatılıyor...")
