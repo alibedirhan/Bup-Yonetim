@@ -33,11 +33,16 @@ jobs:
             --noconsole `
             --onefile `
             --name "BUP_Yonetim" `
+            --paths "." `
             --collect-all customtkinter `
-            --collect-all seaborn `
-            --collect-all fpdf `
+            --collect-submodules shared `
+            --collect-submodules ISKONTO_HESABI `
+            --collect-submodules KARLILIK_ANALIZI `
+            --collect-submodules Musteri_Sayisi_Kontrolu `
+            --collect-submodules YASLANDIRMA `
             --add-data "assets;assets" `
             main.py
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
