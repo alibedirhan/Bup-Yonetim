@@ -1,0 +1,60 @@
+name: Build Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build EXE
+      run: |
+        pyinstaller --noconfirm --onefile --windowed ^
+          --name "BUP_Yonetim" ^
+          --icon "assets/icon.ico" ^
+          --add-data "shared;shared" ^
+          --add-data "ISKONTO_HESABI;ISKONTO_HESABI" ^
+          --add-data "KARLILIK_ANALIZI;KARLILIK_ANALIZI" ^
+          --add-data "Musteri_Sayisi_Kontrolu;Musteri_Sayisi_Kontrolu" ^
+          --add-data "YASLANDIRMA;YASLANDIRMA" ^
+          --hidden-import customtkinter ^
+          --hidden-import PIL ^
+          --hidden-import pandas ^
+          --hidden-import openpyxl ^
+          --hidden-import matplotlib ^
+          --hidden-import pdfplumber ^
+          --collect-data customtkinter ^
+          main.py
+      shell: cmd
+    
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: BUP_Yonetim
+        path: dist/BUP_Yonetim.exe
+    
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/BUP_Yonetim.exe
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

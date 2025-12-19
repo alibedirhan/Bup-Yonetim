@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+testenv/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Build
+build/
+dist/
+*.spec
+*.exe
+
+# Logs & Data
+logs/
+*.log
+data/
+exports/
+
+# Config (kullanıcı bazlı)
+config.json
+analiz_gecmisi.json
+*.db
