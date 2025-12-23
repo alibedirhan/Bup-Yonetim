@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.1.0"
+APP_VERSION = "3.2.0"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları

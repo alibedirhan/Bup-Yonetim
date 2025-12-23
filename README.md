@@ -1,4 +1,4 @@
-# 🐔 Bupiliç Yönetim Sistemi v3
+# 🐔 Bupiliç Yönetim Sistemi v3.2
 
 [![Build](https://github.com/alibedirhan/Bup-Yonetim/actions/workflows/build.yml/badge.svg)](https://github.com/alibedirhan/Bup-Yonetim/actions)
 [![Release](https://img.shields.io/github/v/release/alibedirhan/Bup-Yonetim)](https://github.com/alibedirhan/Bup-Yonetim/releases/latest)
@@ -8,28 +8,66 @@ Tavukçuluk sektörü için modern işletme yönetim sistemi.
 
 ## 📥 İndirme
 
-**[⬇️ Son Sürümü İndir](https://github.com/alibedirhan/Bup-Yonetim/releases/latest/download/BUP_Yonetim.exe)**
+**[⬇️ Son Sürümü İndir](https://github.com/alibedirhan/Bup-Yonetim/releases/latest)**
 
 ## ✨ Özellikler
 
 | Modül | Açıklama |
 |-------|----------|
-| 💰 İskonto Hesaplama | PDF fiyat listelerinden otomatik iskonto |
-| 📊 Karlılık Analizi | Şube ve ürün bazlı karlılık raporları |
-| 👥 Müşteri Takip | Kayıp/kazanç analizi ve trend takibi |
+| 💰 İskonto Hesaplama | PDF fiyat listelerinden otomatik iskonto (maks. 3 PDF) |
+| 📊 Karlılık Analizi | Şube ve ürün bazlı karlılık raporları + Dashboard |
+| 👥 Müşteri Takip | Dönem bazlı müşteri karşılaştırma ve trend takibi |
 | 📈 Yaşlandırma | Cari hesap yaşlandırma ve raporlama |
 
 ## 💻 Sistem Gereksinimleri
 
-- Windows 10/11
+- Windows 10/11 (64-bit)
 - 4 GB RAM
 - 200 MB disk alanı
+- **Ekstra kurulum gerekmez!**
 
 ## 🚀 Kurulum
 
-1. `BUP_Yonetim.exe` dosyasını indirin
-2. Çift tıklayarak çalıştırın
-3. İlk açılışta gerekli klasörler otomatik oluşturulur
+1. Releases sayfasından ZIP dosyasını indirin
+2. ZIP'i istediğiniz konuma çıkarın
+3. `BUP_Yonetim.exe` dosyasını çalıştırın
+4. İlk açılışta `data/`, `logs/`, `exports/` klasörleri otomatik oluşturulur
+
+## 📁 Proje Yapısı
+
+```
+BUP_Yonetim/
+├── BUP_Yonetim.exe          # Ana uygulama
+├── data/                     # Uygulama verileri
+│   └── backups/             # Yedekler
+├── logs/                     # Log dosyaları
+├── exports/                  # Dışa aktarılan dosyalar
+│   ├── excel/               # Excel dosyaları
+│   └── pdf/                 # PDF dosyaları
+└── README.txt               # Kullanım kılavuzu
+```
+
+## 🛠️ Geliştirici Kurulumu
+
+```bash
+# Repoyu klonla
+git clone https://github.com/alibedirhan/Bup-Yonetim.git
+cd Bup-Yonetim
+
+# Sanal ortam oluştur
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
+# Bağımlılıkları yükle
+pip install -r requirements.txt
+
+# Çalıştır
+python main.py
+
+# EXE oluştur
+pyinstaller BUP_Yonetim.spec --clean
+```
 
 ## 📝 Değişiklik Günlüğü
 
@@ -37,7 +75,9 @@ Detaylar için [CHANGELOG.md](CHANGELOG.md) dosyasına bakın.
 
 ## 👨‍💻 Geliştirici
 
-**Ali Bedirhan** - [@alibedirhan](https://github.com/alibedirhan)
+**Ali Bedirhan** 
+- GitHub: [@alibedirhan](https://github.com/alibedirhan)
+- YouTube: [@ali_bedirhan](https://youtube.com/@ali_bedirhan)
 
 ## 📄 Lisans
 

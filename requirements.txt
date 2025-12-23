@@ -1,8 +1,25 @@
+# BUP-ALL-IN-ONE Requirements
+# Windows EXE için tüm bağımlılıklar
+
+# GUI Framework
 customtkinter>=5.2.0
+
+# Data Processing
 pandas>=2.0.0
+numpy>=1.24.0
 openpyxl>=3.1.0
 xlrd>=2.0.0
-matplotlib>=3.7.0
+
+# PDF Processing
 pdfplumber>=0.10.0
+fpdf2>=2.7.0
+
+# Visualization
+matplotlib>=3.7.0
 Pillow>=10.0.0
+
+# Utilities
 python-dateutil>=2.8.0
+
+# Build Tools (dev only)
+pyinstaller>=6.0.0
