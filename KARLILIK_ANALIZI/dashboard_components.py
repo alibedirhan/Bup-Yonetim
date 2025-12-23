@@ -3,9 +3,21 @@
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
-from ui_components import UIComponents
-from themes import get_colors, get_color
-from data_operations import DataCleaner, DataAnalyzer
+
+# Frozen mode için import düzeltmesi
+try:
+    from .ui_components import UIComponents
+    from .themes import get_colors, get_color
+    from .data_operations import DataCleaner, DataAnalyzer
+except ImportError:
+    try:
+        from KARLILIK_ANALIZI.ui_components import UIComponents
+        from KARLILIK_ANALIZI.themes import get_colors, get_color
+        from KARLILIK_ANALIZI.data_operations import DataCleaner, DataAnalyzer
+    except ImportError:
+        from ui_components import UIComponents
+        from themes import get_colors, get_color
+        from data_operations import DataCleaner, DataAnalyzer
 
 
 class DashboardComponents:

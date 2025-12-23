@@ -11,7 +11,15 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union, Any
 import re
-from utils import parse_turkish_number
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import parse_turkish_number
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import parse_turkish_number
+    except ImportError:
+        from utils import parse_turkish_number
 
 logger = logging.getLogger(__name__)
 

@@ -63,8 +63,14 @@ from shared.components import (
     show_success, show_error, show_warning
 )
 
-# Karlılık backend
-from karlilik import KarlilikAnalizi
+# Frozen mode için import düzeltmesi
+try:
+    from .karlilik import KarlilikAnalizi
+except ImportError:
+    try:
+        from KARLILIK_ANALIZI.karlilik import KarlilikAnalizi
+    except ImportError:
+        from karlilik import KarlilikAnalizi
 
 logger = setup_logging("KARLILIK_UI")
 

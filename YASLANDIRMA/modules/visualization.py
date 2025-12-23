@@ -14,7 +14,15 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from utils import format_turkish_number
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import format_turkish_number
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import format_turkish_number
+    except ImportError:
+        from utils import format_turkish_number
 
 logger = logging.getLogger(__name__)
 

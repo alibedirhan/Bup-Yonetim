@@ -10,7 +10,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import pandas as pd
-from utils import format_turkish_number
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import format_turkish_number
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import format_turkish_number
+    except ImportError:
+        from utils import format_turkish_number
+
 import openpyxl
 from openpyxl.styles import Font, PatternFill
 

@@ -2,6 +2,41 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.4] - 2024-12-23
+
+### 🔧 Kritik Düzeltmeler - TÜM MODÜL IMPORT HATALARI
+- **YASLANDIRMA modules/**: Analiz modülü yüklenemedi hatası düzeltildi
+  - `analysis.py`, `reports.py`, `visualization.py`, `analysis_gui.py`
+  - `from utils import` → `from ..utils import` (relative import)
+  - 3 kademeli fallback: relative → package → direct import
+  
+- **KARLILIK_ANALIZI**: Internal import hataları düzeltildi
+  - `dashboard_components.py`, `veri_analizi.py`, `gui.py`, `ui_modern.py`
+  - Tüm internal importlar frozen mode uyumlu hale getirildi
+
+### 📦 Yeni Bağımlılıklar
+- **seaborn>=0.12.0**: Visualization modülü için zorunlu
+
+### 📦 PyInstaller Hidden Imports (Toplam: 180+)
+- Tüm seaborn alt modülleri
+- KARLILIK_ANALIZI: themes, ui_components, veri_analizi, gui, analiz_dashboard, zaman_analizi
+- YASLANDIRMA: gui modülü
+- Musteri_Sayisi_Kontrolu: kurulum modülü
+- weakref, enum, subprocess modülleri
+- collect-all: seaborn eklendi
+
+### 🎯 İmport Stratejisi
+Tüm modüllerde 3 kademeli import stratejisi:
+```python
+try:
+    from .module import X  # Relative import (package olarak)
+except ImportError:
+    try:
+        from PACKAGE.module import X  # Absolute import (frozen mode)
+    except ImportError:
+        from module import X  # Direct import (development)
+```
+
 ## [3.2.3] - 2024-12-23
 
 ### 🔧 Kritik Düzeltmeler

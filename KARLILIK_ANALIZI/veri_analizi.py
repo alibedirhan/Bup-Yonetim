@@ -2,8 +2,18 @@
 
 import pandas as pd
 import numpy as np
-from data_operations import DataCleaner, DataAnalyzer, DataValidator
-from themes import get_colors, get_color
+
+# Frozen mode için import düzeltmesi
+try:
+    from .data_operations import DataCleaner, DataAnalyzer, DataValidator
+    from .themes import get_colors, get_color
+except ImportError:
+    try:
+        from KARLILIK_ANALIZI.data_operations import DataCleaner, DataAnalyzer, DataValidator
+        from KARLILIK_ANALIZI.themes import get_colors, get_color
+    except ImportError:
+        from data_operations import DataCleaner, DataAnalyzer, DataValidator
+        from themes import get_colors, get_color
 
 
 class VeriAnalizi:

@@ -19,8 +19,14 @@ import queue
 import logging
 from datetime import datetime
 
-# Göreceli import yerine doğrudan import
-from karlilik import KarlilikAnalizi
+# Frozen mode için import düzeltmesi
+try:
+    from .karlilik import KarlilikAnalizi
+except ImportError:
+    try:
+        from KARLILIK_ANALIZI.karlilik import KarlilikAnalizi
+    except ImportError:
+        from karlilik import KarlilikAnalizi
 
 
 class BupilicKarlilikGUI:
