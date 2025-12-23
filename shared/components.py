@@ -178,17 +178,17 @@ class ModernButton(ctk.CTkButton):
             hover_color = COLORS['primary_dark']
             text_color = COLORS['text_light']
         elif button_type == 'success':
-            fg_color = COLORS['success']
-            hover_color = darken_color(COLORS['success'], 0.2)
-            text_color = COLORS['text_light']
+            fg_color = "#27AE60"  # Daha koyu yeşil
+            hover_color = "#219A52"
+            text_color = "#FFFFFF"  # Beyaz yazı
         elif button_type == 'danger':
-            fg_color = COLORS['error']
-            hover_color = darken_color(COLORS['error'], 0.2)
-            text_color = COLORS['text_light']
+            fg_color = "#C0392B"  # Daha koyu kırmızı
+            hover_color = "#A93226"
+            text_color = "#FFFFFF"  # Beyaz yazı
         elif button_type == 'warning':
-            fg_color = COLORS['warning']
-            hover_color = darken_color(COLORS['warning'], 0.2)
-            text_color = COLORS['text_light']
+            fg_color = "#E67E22"  # Daha koyu turuncu
+            hover_color = "#D35400"
+            text_color = "#FFFFFF"  # Beyaz yazı
         elif button_type == 'secondary':
             fg_color = "transparent"
             hover_color = COLORS['hover_light']
@@ -335,10 +335,14 @@ class ProgressIndicator(ctk.CTkFrame):
             height=8,
             corner_radius=4,
             progress_color=accent,
-            fg_color=COLORS['border']
+            fg_color=COLORS['border'],
+            mode="determinate"  # Başlangıçta determinate mod
         )
         self.progress_bar.pack(fill="x")
         self.progress_bar.set(0)
+        
+        # Başlangıçta progress bar'ın hareket etmediğinden emin ol
+        self._is_indeterminate = False
     
     def set_progress(self, value: float, status: str = ""):
         """İlerleme değerini ayarla (0-1 arası)"""
@@ -348,19 +352,36 @@ class ProgressIndicator(ctk.CTkFrame):
     
     def reset(self):
         """Sıfırla"""
+        # Önce indeterminate modu durdur
+        if self._is_indeterminate:
+            try:
+                self.progress_bar.stop()
+            except:
+                pass
+            self._is_indeterminate = False
+        
+        # Determinate moda geç ve sıfırla
+        self.progress_bar.configure(mode="determinate")
         self.progress_bar.set(0)
         self.status_label.configure(text="Hazır")
     
     def set_indeterminate(self, status: str = "İşlem devam ediyor..."):
         """Belirsiz mod"""
+        self._is_indeterminate = True
         self.progress_bar.configure(mode="indeterminate")
         self.progress_bar.start()
         self.status_label.configure(text=status)
     
     def stop_indeterminate(self):
         """Belirsiz modu durdur"""
-        self.progress_bar.stop()
+        if self._is_indeterminate:
+            try:
+                self.progress_bar.stop()
+            except:
+                pass
+            self._is_indeterminate = False
         self.progress_bar.configure(mode="determinate")
+        self.progress_bar.set(0)
 
 
 # ============================================================================

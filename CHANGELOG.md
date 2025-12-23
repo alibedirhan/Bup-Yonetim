@@ -2,6 +2,59 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.6] - 2024-12-24
+
+### 🔧 ISKONTO_HESABI UI Düzeltmeleri
+
+#### İskonto Sekmesi Layout Sorunu
+- Scrollable frame eklendi - tüm kategoriler artık görünür
+- Kategori kartları daha kompakt hale getirildi
+- Alt kısımda "Önizleme Oluştur" butonu eklendi
+
+#### Progress Bar Sorunu
+- Başlangıçta determinate modda başlatılıyor
+- `reset()` metodu düzgün çalışıyor
+- Indeterminate mod düzgün durduruluyor
+
+#### Buton Okunabilirlik Sorunu
+- **Tüm buton renkleri daha koyu** yapıldı (beyaz yazı net okunuyor):
+  - Success (Yeşil): `#27AE60` → `#219A52`
+  - Danger (Kırmızı): `#C0392B` → `#A93226`
+  - Warning (Turuncu): `#E67E22` → `#D35400`
+- Hızlı ayar butonlarına border eklendi
+- Font weight: bold yapıldı
+
+### 📦 shared/components.py Güncellemeleri
+- `ModernButton`: Tüm renk tiplerinde beyaz yazı garantisi
+- `ProgressIndicator`: 
+  - `_is_indeterminate` flag eklendi
+  - `mode="determinate"` açıkça belirtildi
+  - Daha sağlam start/stop mantığı
+
+## [3.2.5] - 2024-12-24
+
+### 🔧 Kapsamlı İnceleme - Tüm Modüller
+
+#### YASLANDIRMA/gui Klasörü (6 dosya düzeltildi):
+- `__init__.py`: Tüm importlar 3 kademeli fallback'e geçirildi
+- `analysis_operations.py`: `from utils import` → `from ..utils import`
+- `analysis_tabs.py`: Aynı düzeltme
+- `file_operations.py`: Aynı düzeltme
+- `main_gui.py`: Tüm importlar (excel_processor, utils, gui modülleri, modules/)
+- `tab_methods.py`: format_number_display ve format_turkish_number importları
+
+#### Musteri_Sayisi_Kontrolu (2 dosya düzeltildi):
+- `main.py`: `from ui import` → 3 kademeli fallback
+- `ui_modern.py`: `from main import ExcelComparisonLogic` → 3 kademeli fallback
+
+### 📦 Teknik Detaylar
+- Toplam 8 dosyada import düzeltmesi yapıldı
+- Tüm modüllerde frozen mode uyumluluğu sağlandı
+- 3 kademeli import stratejisi:
+  1. Relative import (`.module` veya `..module`)
+  2. Package import (`PACKAGE.module`)
+  3. Direct import (`module`)
+
 ## [3.2.4] - 2024-12-23
 
 ### 🔧 Kritik Düzeltmeler - TÜM MODÜL IMPORT HATALARI

@@ -17,7 +17,15 @@ if str(_parent_dir) not in sys.path:
 import threading
 import logging
 from tkinter import messagebox
-from utils import format_number_display
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import format_number_display
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import format_number_display
+    except ImportError:
+        from utils import format_number_display
 
 logger = logging.getLogger(__name__)
 

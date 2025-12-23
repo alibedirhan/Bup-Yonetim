@@ -36,7 +36,13 @@ DEFAULT_OUTPUT_NAME = "karşılaştırma_sonucu"
 
 # UI import kontrolü
 try:
-    from ui import ModernExcelComparisonUI
+    try:
+        from .ui import ModernExcelComparisonUI
+    except ImportError:
+        try:
+            from Musteri_Sayisi_Kontrolu.ui import ModernExcelComparisonUI
+        except ImportError:
+            from ui import ModernExcelComparisonUI
 except ImportError as e:
     print(f"HATA: ui.py import edilemedi: {e}")
     ModernExcelComparisonUI = None

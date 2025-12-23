@@ -221,27 +221,38 @@ class IskontoHesabiApp(ctk.CTkFrame):
         """İskonto ayarları tabı"""
         tab = self.tabview.tab("💰 İskonto Ayarla")
         tab.grid_columnconfigure(0, weight=1)
+        tab.grid_rowconfigure(0, weight=1)
+        
+        # Scrollable frame
+        scroll_frame = ctk.CTkScrollableFrame(
+            tab, 
+            fg_color="transparent",
+            scrollbar_button_color=COLORS['border'],
+            scrollbar_button_hover_color=ACCENT
+        )
+        scroll_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        scroll_frame.grid_columnconfigure(0, weight=1)
         
         # Başlık
         title = ctk.CTkLabel(
-            tab,
+            scroll_frame,
             text="İskonto Oranlarını Ayarlayın",
             font=ctk.CTkFont(family=FONTS['heading'][0], size=FONTS['heading'][1], weight='bold'),
             text_color=COLORS['text_primary']
         )
-        title.grid(row=0, column=0, pady=(20, 5))
+        title.grid(row=0, column=0, pady=(10, 5))
         
         # Not
         note = ctk.CTkLabel(
-            tab,
+            scroll_frame,
             text="Not: Belirlenen iskonto oranları tüm yüklenen PDF dosyalarına uygulanacaktır.",
             font=ctk.CTkFont(family=FONTS['small'][0], size=FONTS['small'][1]),
             text_color=COLORS['warning']
         )
-        note.grid(row=1, column=0, pady=(0, 15))
+        note.grid(row=1, column=0, pady=(0, 10))
         
         # Hızlı ayar butonları
-        quick_frame = ctk.CTkFrame(tab, fg_color="transparent")
+        quick_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
         quick_frame.grid(row=2, column=0, pady=10)
         
         ctk.CTkLabel(
@@ -255,33 +266,35 @@ class IskontoHesabiApp(ctk.CTkFrame):
             btn = ctk.CTkButton(
                 quick_frame,
                 text=f"Tümü %{value}",
-                width=80,
+                width=85,
                 height=32,
-                fg_color=COLORS['border'],
+                fg_color=COLORS['bg_card'],
                 hover_color=COLORS['hover_light'],
                 text_color=COLORS['text_primary'],
-                font=ctk.CTkFont(family=FONTS['small'][0], size=FONTS['small'][1]),
+                border_width=1,
+                border_color=COLORS['border'],
+                font=ctk.CTkFont(family=FONTS['small'][0], size=FONTS['small'][1], weight='bold'),
                 command=lambda v=value: self._set_all_discounts(v)
             )
             btn.pack(side="left", padx=3)
         
-        # Sıfırla butonu
+        # Sıfırla butonu - beyaz yazı için daha koyu kırmızı
         reset_btn = ctk.CTkButton(
             quick_frame,
             text="Sıfırla",
             width=80,
             height=32,
-            fg_color=COLORS['error'],
-            hover_color=COLORS['accent_red'],
-            text_color=COLORS['text_light'],
-            font=ctk.CTkFont(family=FONTS['small'][0], size=FONTS['small'][1]),
+            fg_color="#C0392B",  # Daha koyu kırmızı
+            hover_color="#A93226",
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family=FONTS['small'][0], size=FONTS['small'][1], weight='bold'),
             command=lambda: self._set_all_discounts(0)
         )
         reset_btn.pack(side="left", padx=(15, 0))
         
         # Kategori kartları
-        categories_frame = ctk.CTkFrame(tab, fg_color="transparent")
-        categories_frame.grid(row=3, column=0, sticky="nsew", padx=40, pady=20)
+        categories_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        categories_frame.grid(row=3, column=0, sticky="nsew", padx=20, pady=10)
         categories_frame.grid_columnconfigure((0, 1), weight=1)
         
         self.category_cards = {}
@@ -297,11 +310,11 @@ class IskontoHesabiApp(ctk.CTkFrame):
                 border_width=1,
                 border_color=COLORS['border']
             )
-            card.grid(row=row, column=col, padx=10, pady=10, sticky="ew")
+            card.grid(row=row, column=col, padx=8, pady=8, sticky="ew")
             
             # Header
             header = ctk.CTkFrame(card, fg_color="transparent")
-            header.pack(fill="x", padx=15, pady=(15, 10))
+            header.pack(fill="x", padx=12, pady=(12, 8))
             
             ctk.CTkLabel(
                 header,
@@ -321,7 +334,7 @@ class IskontoHesabiApp(ctk.CTkFrame):
             
             # İskonto girişi
             input_frame = ctk.CTkFrame(card, fg_color="transparent")
-            input_frame.pack(fill="x", padx=15, pady=(0, 15))
+            input_frame.pack(fill="x", padx=12, pady=(0, 12))
             
             ctk.CTkLabel(
                 input_frame,
@@ -348,6 +361,23 @@ class IskontoHesabiApp(ctk.CTkFrame):
                 'count_label': count_label,
                 'entry': entry
             }
+        
+        # Hesapla butonu - alt kısımda
+        calc_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        calc_frame.grid(row=4, column=0, pady=(10, 20))
+        
+        calc_btn = ctk.CTkButton(
+            calc_frame,
+            text="🔄 Önizleme Oluştur",
+            width=200,
+            height=40,
+            fg_color=ACCENT,
+            hover_color=ACCENT_HOVER,
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family=FONTS['body'][0], size=14, weight='bold'),
+            command=self._preview_data
+        )
+        calc_btn.pack()
     
     def _create_preview_tab(self):
         """Önizleme tabı"""
@@ -445,38 +475,50 @@ class IskontoHesabiApp(ctk.CTkFrame):
         btn_frame = ctk.CTkFrame(control_frame, fg_color="transparent")
         btn_frame.grid(row=1, column=0, sticky="e")
         
-        # Excel butonu
-        self.excel_btn = ModernButton(
+        # Excel butonu - koyu yeşil, beyaz yazı
+        self.excel_btn = ctk.CTkButton(
             btn_frame,
-            text="Excel'e Aktar",
-            icon="📊",
-            command=lambda: self._export_data('excel'),
-            button_type='success',
-            width=150
+            text="📊 Excel'e Aktar",
+            width=150,
+            height=40,
+            corner_radius=8,
+            fg_color="#27AE60",  # Koyu yeşil
+            hover_color="#219A52",
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family="Segoe UI", size=13, weight='bold'),
+            command=lambda: self._export_data('excel')
         )
         self.excel_btn.pack(side="left", padx=5)
         self.excel_btn.configure(state="disabled")
         
-        # PDF butonu
-        self.pdf_btn = ModernButton(
+        # PDF butonu - koyu kırmızı, beyaz yazı
+        self.pdf_btn = ctk.CTkButton(
             btn_frame,
-            text="PDF'lere Aktar",
-            icon="📄",
-            command=lambda: self._export_data('pdf'),
-            button_type='danger',
-            width=150
+            text="📄 PDF'e Aktar",
+            width=150,
+            height=40,
+            corner_radius=8,
+            fg_color="#C0392B",  # Koyu kırmızı
+            hover_color="#A93226",
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family="Segoe UI", size=13, weight='bold'),
+            command=lambda: self._export_data('pdf')
         )
         self.pdf_btn.pack(side="left", padx=5)
         self.pdf_btn.configure(state="disabled")
         
-        # Her ikisi butonu
-        self.both_btn = ModernButton(
+        # Her ikisi butonu - modül accent rengi
+        self.both_btn = ctk.CTkButton(
             btn_frame,
-            text="Her İkisi",
-            icon="📊📄",
-            command=lambda: self._export_data('both'),
-            module_name=MODULE_NAME,
-            width=150
+            text="📊📄 Her İkisi",
+            width=150,
+            height=40,
+            corner_radius=8,
+            fg_color=ACCENT,
+            hover_color=ACCENT_HOVER,
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family="Segoe UI", size=13, weight='bold'),
+            command=lambda: self._export_data('both')
         )
         self.both_btn.pack(side="left", padx=5)
         self.both_btn.configure(state="disabled")

@@ -18,7 +18,15 @@ import pandas as pd
 import threading
 import logging
 from tkinter import messagebox, filedialog
-from utils import format_number_display
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import format_number_display
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import format_number_display
+    except ImportError:
+        from utils import format_number_display
 
 logger = logging.getLogger(__name__)
 

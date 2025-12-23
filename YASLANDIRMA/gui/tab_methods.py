@@ -51,7 +51,15 @@ import tkinter.ttk as ttk
 import pandas as pd
 import logging
 from datetime import datetime
-from utils import format_number_display, format_turkish_number
+
+# Frozen mode için import düzeltmesi
+try:
+    from ..utils import format_number_display, format_turkish_number
+except ImportError:
+    try:
+        from YASLANDIRMA.utils import format_number_display, format_turkish_number
+    except ImportError:
+        from utils import format_number_display, format_turkish_number
 
 logger = logging.getLogger(__name__)
 

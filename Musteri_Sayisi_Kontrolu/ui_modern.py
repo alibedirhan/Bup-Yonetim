@@ -964,7 +964,13 @@ class MusteriTakipApp(ctk.CTkFrame):
 
 def main():
     """Standalone çalıştırma (test için)"""
-    from main import ExcelComparisonLogic
+    try:
+        from .main import ExcelComparisonLogic
+    except ImportError:
+        try:
+            from Musteri_Sayisi_Kontrolu.main import ExcelComparisonLogic
+        except ImportError:
+            from main import ExcelComparisonLogic
     
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("blue")

@@ -57,30 +57,76 @@ import logging
 from datetime import datetime
 import tkinter as tk
 
-# Ana modül importları
-from excel_processor import ExcelProcessor, ExcelProcessorError
-from utils import format_number_display
+# Ana modül importları - frozen mode için düzeltme
+try:
+    from ..excel_processor import ExcelProcessor, ExcelProcessorError
+    from ..utils import format_number_display
+except ImportError:
+    try:
+        from YASLANDIRMA.excel_processor import ExcelProcessor, ExcelProcessorError
+        from YASLANDIRMA.utils import format_number_display
+    except ImportError:
+        from excel_processor import ExcelProcessor, ExcelProcessorError
+        from utils import format_number_display
 
-# GUI modüllerini import et
-from file_tab import create_file_processing_tab
-from analysis_tabs import create_analysis_overview_tab, create_arac_detail_tab
-from other_tabs import create_assignment_tab, create_reports_tab, create_charts_tab
-from ui_helpers import (
-    ToolTip, add_tooltip, ProgressManager, ThreadedAnalysis,
-    show_help_dialog, show_about_dialog, show_quick_help, show_keyboard_shortcuts
-)
-from tab_methods import TabMethods
-from file_operations import FileOperations
-from analysis_operations import AnalysisOperations
+# GUI modüllerini import et - frozen mode için düzeltme
+try:
+    from .file_tab import create_file_processing_tab
+    from .analysis_tabs import create_analysis_overview_tab, create_arac_detail_tab
+    from .other_tabs import create_assignment_tab, create_reports_tab, create_charts_tab
+    from .ui_helpers import (
+        ToolTip, add_tooltip, ProgressManager, ThreadedAnalysis,
+        show_help_dialog, show_about_dialog, show_quick_help, show_keyboard_shortcuts
+    )
+    from .tab_methods import TabMethods
+    from .file_operations import FileOperations
+    from .analysis_operations import AnalysisOperations
+except ImportError:
+    try:
+        from YASLANDIRMA.gui.file_tab import create_file_processing_tab
+        from YASLANDIRMA.gui.analysis_tabs import create_analysis_overview_tab, create_arac_detail_tab
+        from YASLANDIRMA.gui.other_tabs import create_assignment_tab, create_reports_tab, create_charts_tab
+        from YASLANDIRMA.gui.ui_helpers import (
+            ToolTip, add_tooltip, ProgressManager, ThreadedAnalysis,
+            show_help_dialog, show_about_dialog, show_quick_help, show_keyboard_shortcuts
+        )
+        from YASLANDIRMA.gui.tab_methods import TabMethods
+        from YASLANDIRMA.gui.file_operations import FileOperations
+        from YASLANDIRMA.gui.analysis_operations import AnalysisOperations
+    except ImportError:
+        from file_tab import create_file_processing_tab
+        from analysis_tabs import create_analysis_overview_tab, create_arac_detail_tab
+        from other_tabs import create_assignment_tab, create_reports_tab, create_charts_tab
+        from ui_helpers import (
+            ToolTip, add_tooltip, ProgressManager, ThreadedAnalysis,
+            show_help_dialog, show_about_dialog, show_quick_help, show_keyboard_shortcuts
+        )
+        from tab_methods import TabMethods
+        from file_operations import FileOperations
+        from analysis_operations import AnalysisOperations
 
 # Analiz modülü import
 try:
     sys.path.insert(0, str(_yaslandirma_dir / 'modules'))
-    from analysis import AnalysisEngine
-    from assignment import AssignmentManager
-    from data_manager import DataManager
-    from reports import ReportGenerator
-    from visualization import VisualizationEngine
+    try:
+        from ..modules.analysis import AnalysisEngine
+        from ..modules.assignment import AssignmentManager
+        from ..modules.data_manager import DataManager
+        from ..modules.reports import ReportGenerator
+        from ..modules.visualization import VisualizationEngine
+    except ImportError:
+        try:
+            from YASLANDIRMA.modules.analysis import AnalysisEngine
+            from YASLANDIRMA.modules.assignment import AssignmentManager
+            from YASLANDIRMA.modules.data_manager import DataManager
+            from YASLANDIRMA.modules.reports import ReportGenerator
+            from YASLANDIRMA.modules.visualization import VisualizationEngine
+        except ImportError:
+            from analysis import AnalysisEngine
+            from assignment import AssignmentManager
+            from data_manager import DataManager
+            from reports import ReportGenerator
+            from visualization import VisualizationEngine
     ANALYSIS_MODULE_AVAILABLE = True
 except ImportError as e:
     ANALYSIS_MODULE_AVAILABLE = False
