@@ -2,6 +2,24 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.3] - 2024-12-23
+
+### 🔧 Kritik Düzeltmeler
+- **logging.handlers**: `No module named 'logging.handlers'` hatası düzeltildi
+- **PyInstaller Hidden Imports**: 130+ modül eklendi
+  - logging, logging.handlers, logging.config
+  - Tüm tkinter alt modülleri (_tkinter, simpledialog)
+  - Tüm pandas._libs alt modülleri
+  - Tüm pdfminer alt modülleri
+  - Tüm openpyxl.styles alt modülleri
+  - platform, traceback, tempfile, gc modülleri
+- **collect-all**: pdfminer paketi de collect-all'a eklendi
+- **collect-data**: fpdf paketi de collect-data'ya eklendi
+
+### 📦 Teknik Değişiklikler
+- Workflow'daki hidden-import sayısı 50'den 130+'a çıkarıldı
+- Tüm standart kütüphane modülleri açıkça belirtildi
+
 ## [3.2.2] - 2024-12-23
 
 ### 🔧 Düzeltmeler

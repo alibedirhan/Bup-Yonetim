@@ -80,24 +80,40 @@ jobs:
           --add-data "YASLANDIRMA;YASLANDIRMA" `
           --add-data "assets;assets" `
           --add-data "VERSION;." `
+          --hidden-import "logging" `
+          --hidden-import "logging.handlers" `
+          --hidden-import "logging.config" `
           --hidden-import "customtkinter" `
           --hidden-import "tkinter" `
           --hidden-import "tkinter.ttk" `
           --hidden-import "tkinter.filedialog" `
           --hidden-import "tkinter.messagebox" `
+          --hidden-import "tkinter.simpledialog" `
+          --hidden-import "_tkinter" `
           --hidden-import "pandas" `
+          --hidden-import "pandas._libs" `
+          --hidden-import "pandas._libs.tslibs" `
           --hidden-import "pandas._libs.tslibs.timedeltas" `
           --hidden-import "pandas._libs.tslibs.nattype" `
           --hidden-import "pandas._libs.tslibs.np_datetime" `
+          --hidden-import "pandas.core.arrays.sparse" `
           --hidden-import "numpy" `
           --hidden-import "numpy.core._methods" `
+          --hidden-import "numpy.lib.format" `
           --hidden-import "openpyxl" `
           --hidden-import "openpyxl.styles" `
+          --hidden-import "openpyxl.styles.fonts" `
+          --hidden-import "openpyxl.styles.borders" `
+          --hidden-import "openpyxl.styles.alignment" `
+          --hidden-import "openpyxl.styles.fills" `
           --hidden-import "openpyxl.cell" `
           --hidden-import "openpyxl.utils" `
+          --hidden-import "openpyxl.workbook" `
+          --hidden-import "openpyxl.worksheet" `
           --hidden-import "xlrd" `
           --hidden-import "pdfplumber" `
           --hidden-import "pdfplumber.page" `
+          --hidden-import "pdfplumber.table" `
           --hidden-import "pdfminer" `
           --hidden-import "pdfminer.high_level" `
           --hidden-import "pdfminer.layout" `
@@ -106,15 +122,23 @@ jobs:
           --hidden-import "pdfminer.converter" `
           --hidden-import "pdfminer.pdfdocument" `
           --hidden-import "pdfminer.pdfparser" `
+          --hidden-import "pdfminer.psparser" `
+          --hidden-import "pdfminer.pdftypes" `
+          --hidden-import "pdfminer.utils" `
           --hidden-import "fpdf" `
+          --hidden-import "fpdf.fpdf" `
           --hidden-import "matplotlib" `
           --hidden-import "matplotlib.pyplot" `
+          --hidden-import "matplotlib.figure" `
+          --hidden-import "matplotlib.backends" `
           --hidden-import "matplotlib.backends.backend_tkagg" `
           --hidden-import "matplotlib.backends.backend_agg" `
           --hidden-import "matplotlib.font_manager" `
+          --hidden-import "matplotlib._pylab_helpers" `
           --hidden-import "PIL" `
           --hidden-import "PIL.Image" `
           --hidden-import "PIL.ImageTk" `
+          --hidden-import "PIL._tkinter_finder" `
           --hidden-import "shared" `
           --hidden-import "shared.utils" `
           --hidden-import "shared.theme" `
@@ -126,24 +150,56 @@ jobs:
           --hidden-import "KARLILIK_ANALIZI" `
           --hidden-import "KARLILIK_ANALIZI.karlilik" `
           --hidden-import "KARLILIK_ANALIZI.ui_ctk" `
+          --hidden-import "KARLILIK_ANALIZI.data_operations" `
+          --hidden-import "KARLILIK_ANALIZI.dashboard_components" `
           --hidden-import "Musteri_Sayisi_Kontrolu" `
           --hidden-import "Musteri_Sayisi_Kontrolu.main" `
+          --hidden-import "Musteri_Sayisi_Kontrolu.ui" `
           --hidden-import "Musteri_Sayisi_Kontrolu.ui_modern" `
           --hidden-import "YASLANDIRMA" `
           --hidden-import "YASLANDIRMA.excel_processor" `
           --hidden-import "YASLANDIRMA.ui_modern" `
+          --hidden-import "YASLANDIRMA.utils" `
           --hidden-import "YASLANDIRMA.modules" `
           --hidden-import "YASLANDIRMA.modules.analysis" `
           --hidden-import "YASLANDIRMA.modules.assignment" `
           --hidden-import "YASLANDIRMA.modules.data_manager" `
           --hidden-import "YASLANDIRMA.modules.reports" `
           --hidden-import "YASLANDIRMA.modules.visualization" `
+          --hidden-import "YASLANDIRMA.modules.analysis_gui" `
           --hidden-import "encodings" `
           --hidden-import "encodings.utf_8" `
           --hidden-import "encodings.cp1254" `
+          --hidden-import "encodings.latin_1" `
+          --hidden-import "encodings.ascii" `
+          --hidden-import "encodings.cp1252" `
+          --hidden-import "json" `
+          --hidden-import "threading" `
+          --hidden-import "queue" `
+          --hidden-import "datetime" `
+          --hidden-import "pathlib" `
+          --hidden-import "typing" `
+          --hidden-import "re" `
+          --hidden-import "locale" `
+          --hidden-import "functools" `
+          --hidden-import "collections" `
+          --hidden-import "io" `
+          --hidden-import "os" `
+          --hidden-import "sys" `
+          --hidden-import "tempfile" `
+          --hidden-import "gc" `
+          --hidden-import "traceback" `
+          --hidden-import "platform" `
+          --hidden-import "dateutil" `
+          --hidden-import "dateutil.parser" `
+          --hidden-import "dateutil.tz" `
+          --hidden-import "cryptography" `
+          --hidden-import "charset_normalizer" `
           --collect-all "customtkinter" `
           --collect-all "pdfplumber" `
+          --collect-all "pdfminer" `
           --collect-data "matplotlib" `
+          --collect-data "fpdf" `
           main.py
         
         # Verify
