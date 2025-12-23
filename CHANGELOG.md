@@ -2,6 +2,19 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.2] - 2024-12-23
+
+### 🔧 Düzeltmeler
+- **GitHub Actions**: Spec dosyası sorunu tamamen çözüldü
+  - Workflow artık spec dosyasına ihtiyaç duymuyor
+  - Tüm PyInstaller parametreleri komut satırında
+- **Build Süreci**: Daha güvenilir build sistemi
+
+### 📦 Teknik Değişiklikler
+- `.github/workflows/build.yml` tamamen yeniden yazıldı
+- Spec dosyası kaldırıldı (gitignore sorunu nedeniyle)
+- Tüm hidden imports ve collect-all komutları workflow'a taşındı
+
 ## [3.2.1] - 2024-12-23
 
 ### 🔧 Düzeltmeler

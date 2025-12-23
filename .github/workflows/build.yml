@@ -1,5 +1,5 @@
 # BUP-ALL-IN-ONE Windows EXE Build Workflow
-# Bu workflow her release tag'inde veya manuel tetiklemede çalışır
+# Spec dosyası kullanmadan doğrudan komut satırı ile build
 
 name: Build Windows EXE
 
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number (e.g., 3.2.0)'
+        description: 'Version number (e.g., 3.2.1)'
         required: false
         default: ''
 
@@ -22,43 +22,36 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    # ========================================
-    # CHECKOUT
-    # ========================================
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    # ========================================
-    # PYTHON SETUP
-    # ========================================
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
 
-    # ========================================
-    # DEPENDENCIES
-    # ========================================
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip wheel setuptools
-        pip install -r requirements.txt
+        pip install customtkinter>=5.2.0
+        pip install pandas>=2.0.0
+        pip install numpy>=1.24.0
+        pip install openpyxl>=3.1.0
+        pip install xlrd>=2.0.0
+        pip install pdfplumber>=0.10.0
+        pip install fpdf2>=2.7.0
+        pip install matplotlib>=3.7.0
+        pip install Pillow>=10.0.0
+        pip install python-dateutil>=2.8.0
         pip install pyinstaller>=6.0.0
         
-        # Verify installations
+        # Verify
         python -c "import customtkinter; print(f'CustomTkinter: {customtkinter.__version__}')"
         python -c "import pandas; print(f'Pandas: {pandas.__version__}')"
-        python -c "import pdfplumber; print('pdfplumber: OK')"
-        python -c "import fpdf; print('fpdf: OK')"
-        python -c "import matplotlib; print(f'Matplotlib: {matplotlib.__version__}')"
-        python -c "import openpyxl; print(f'Openpyxl: {openpyxl.__version__}')"
 
-    # ========================================
-    # VERSION DETECTION
-    # ========================================
     - name: Get version
       id: version
       shell: bash
@@ -71,19 +64,89 @@ jobs:
           echo "version=$(cat VERSION | tr -d '\n\r')" >> $GITHUB_OUTPUT
         fi
 
-    # ========================================
-    # BUILD EXE
-    # ========================================
     - name: Build EXE with PyInstaller
       run: |
-        # Clean previous builds
+        # Clean
         if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
         if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
         
-        # Build using spec file
-        pyinstaller BUP_Yonetim.spec --clean --noconfirm
+        # Build with command line (no spec file needed)
+        pyinstaller --noconfirm --onefile --windowed `
+          --name "BUP_Yonetim" `
+          --add-data "shared;shared" `
+          --add-data "ISKONTO_HESABI;ISKONTO_HESABI" `
+          --add-data "KARLILIK_ANALIZI;KARLILIK_ANALIZI" `
+          --add-data "Musteri_Sayisi_Kontrolu;Musteri_Sayisi_Kontrolu" `
+          --add-data "YASLANDIRMA;YASLANDIRMA" `
+          --add-data "assets;assets" `
+          --add-data "VERSION;." `
+          --hidden-import "customtkinter" `
+          --hidden-import "tkinter" `
+          --hidden-import "tkinter.ttk" `
+          --hidden-import "tkinter.filedialog" `
+          --hidden-import "tkinter.messagebox" `
+          --hidden-import "pandas" `
+          --hidden-import "pandas._libs.tslibs.timedeltas" `
+          --hidden-import "pandas._libs.tslibs.nattype" `
+          --hidden-import "pandas._libs.tslibs.np_datetime" `
+          --hidden-import "numpy" `
+          --hidden-import "numpy.core._methods" `
+          --hidden-import "openpyxl" `
+          --hidden-import "openpyxl.styles" `
+          --hidden-import "openpyxl.cell" `
+          --hidden-import "openpyxl.utils" `
+          --hidden-import "xlrd" `
+          --hidden-import "pdfplumber" `
+          --hidden-import "pdfplumber.page" `
+          --hidden-import "pdfminer" `
+          --hidden-import "pdfminer.high_level" `
+          --hidden-import "pdfminer.layout" `
+          --hidden-import "pdfminer.pdfpage" `
+          --hidden-import "pdfminer.pdfinterp" `
+          --hidden-import "pdfminer.converter" `
+          --hidden-import "pdfminer.pdfdocument" `
+          --hidden-import "pdfminer.pdfparser" `
+          --hidden-import "fpdf" `
+          --hidden-import "matplotlib" `
+          --hidden-import "matplotlib.pyplot" `
+          --hidden-import "matplotlib.backends.backend_tkagg" `
+          --hidden-import "matplotlib.backends.backend_agg" `
+          --hidden-import "matplotlib.font_manager" `
+          --hidden-import "PIL" `
+          --hidden-import "PIL.Image" `
+          --hidden-import "PIL.ImageTk" `
+          --hidden-import "shared" `
+          --hidden-import "shared.utils" `
+          --hidden-import "shared.theme" `
+          --hidden-import "shared.components" `
+          --hidden-import "ISKONTO_HESABI" `
+          --hidden-import "ISKONTO_HESABI.pdf_processor" `
+          --hidden-import "ISKONTO_HESABI.export_manager" `
+          --hidden-import "ISKONTO_HESABI.ui" `
+          --hidden-import "KARLILIK_ANALIZI" `
+          --hidden-import "KARLILIK_ANALIZI.karlilik" `
+          --hidden-import "KARLILIK_ANALIZI.ui_ctk" `
+          --hidden-import "Musteri_Sayisi_Kontrolu" `
+          --hidden-import "Musteri_Sayisi_Kontrolu.main" `
+          --hidden-import "Musteri_Sayisi_Kontrolu.ui_modern" `
+          --hidden-import "YASLANDIRMA" `
+          --hidden-import "YASLANDIRMA.excel_processor" `
+          --hidden-import "YASLANDIRMA.ui_modern" `
+          --hidden-import "YASLANDIRMA.modules" `
+          --hidden-import "YASLANDIRMA.modules.analysis" `
+          --hidden-import "YASLANDIRMA.modules.assignment" `
+          --hidden-import "YASLANDIRMA.modules.data_manager" `
+          --hidden-import "YASLANDIRMA.modules.reports" `
+          --hidden-import "YASLANDIRMA.modules.visualization" `
+          --hidden-import "encodings" `
+          --hidden-import "encodings.utf_8" `
+          --hidden-import "encodings.cp1254" `
+          --collect-all "customtkinter" `
+          --collect-all "pdfplumber" `
+          --collect-data "matplotlib" `
+          main.py
         
-        # Verify build
+        # Verify
         if (Test-Path "dist/BUP_Yonetim.exe") {
           $size = (Get-Item "dist/BUP_Yonetim.exe").Length / 1MB
           Write-Host "Build successful! EXE size: $([math]::Round($size, 2)) MB"
@@ -92,21 +155,15 @@ jobs:
           exit 1
         }
 
-    # ========================================
-    # CREATE RELEASE PACKAGE
-    # ========================================
     - name: Create release package
       run: |
         $version = "${{ steps.version.outputs.version }}"
         $releaseDir = "BUP_Yonetim_v$version"
         
-        # Create release directory
         New-Item -ItemType Directory -Force -Path $releaseDir
-        
-        # Copy EXE
         Copy-Item "dist/BUP_Yonetim.exe" "$releaseDir/"
         
-        # Create empty directories for user data
+        # Create directories
         New-Item -ItemType Directory -Force -Path "$releaseDir/data"
         New-Item -ItemType Directory -Force -Path "$releaseDir/data/backups"
         New-Item -ItemType Directory -Force -Path "$releaseDir/logs"
@@ -114,7 +171,7 @@ jobs:
         New-Item -ItemType Directory -Force -Path "$releaseDir/exports/excel"
         New-Item -ItemType Directory -Force -Path "$releaseDir/exports/pdf"
         
-        # Create README
+        # README
         @"
         ========================================
         BUPİLİÇ İŞLETME YÖNETİM SİSTEMİ v$version
@@ -124,37 +181,18 @@ jobs:
         1. Bu klasörü istediğiniz yere çıkarın
         2. BUP_Yonetim.exe dosyasını çalıştırın
         
-        KLASÖR YAPISI:
-        - data/       : Uygulama verileri
-        - logs/       : Log dosyaları
-        - exports/    : Dışa aktarılan dosyalar
-          - excel/    : Excel dosyaları
-          - pdf/      : PDF dosyaları
-        
         MODÜLLER:
-        - İskonto Hesaplama: PDF fiyat listelerinden iskonto hesaplama
-        - Karlılık Analizi: Excel tabanlı karlılık raporları
-        - Müşteri Takip: Dönem bazlı müşteri karşılaştırma
-        - Yaşlandırma: Cari hesap yaşlandırma analizi
-        
-        GEREKSINIMLER:
-        - Windows 10/11 (64-bit)
-        - Ekstra kurulum gerekmez!
-        
-        SORUN BILDIRIMI:
-        logs/ klasöründeki dosyaları inceleyebilirsiniz.
+        - İskonto Hesaplama
+        - Karlılık Analizi
+        - Müşteri Takip
+        - Yaşlandırma
         
         © 2024-2025 Ali Bedirhan
         "@ | Out-File -FilePath "$releaseDir/README.txt" -Encoding UTF8
         
-        # Create ZIP
         Compress-Archive -Path "$releaseDir/*" -DestinationPath "BUP_Yonetim_v$version.zip" -Force
-        
-        Write-Host "Release package created: BUP_Yonetim_v$version.zip"
+        Write-Host "Package created: BUP_Yonetim_v$version.zip"
 
-    # ========================================
-    # UPLOAD ARTIFACTS (for non-tag builds)
-    # ========================================
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
@@ -162,9 +200,6 @@ jobs:
         path: BUP_Yonetim_v${{ steps.version.outputs.version }}.zip
         retention-days: 30
 
-    # ========================================
-    # CREATE GITHUB RELEASE (only for tags)
-    # ========================================
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
@@ -174,20 +209,13 @@ jobs:
           ## 🚀 BUPİLİÇ İşletme Yönetim Sistemi v${{ steps.version.outputs.version }}
           
           ### 📦 İndirme
-          Aşağıdaki ZIP dosyasını indirip çıkarın, ardından `BUP_Yonetim.exe` dosyasını çalıştırın.
+          ZIP dosyasını indirip çıkarın, `BUP_Yonetim.exe` çalıştırın.
           
-          ### ✨ Özellikler
-          - 💰 **İskonto Hesaplama**: PDF fiyat listelerinden otomatik iskonto hesaplama
-          - 📊 **Karlılık Analizi**: Detaylı karlılık raporları ve dashboard
-          - 👥 **Müşteri Takip**: Dönem bazlı müşteri karşılaştırma
-          - 📈 **Yaşlandırma**: Cari hesap yaşlandırma analizi
-          
-          ### 💻 Sistem Gereksinimleri
-          - Windows 10/11 (64-bit)
-          - Ekstra kurulum gerekmez!
-          
-          ### 📋 Değişiklikler
-          Bu sürümde yapılan değişiklikler için [CHANGELOG](CHANGELOG.md) dosyasına bakın.
+          ### ✨ Modüller
+          - 💰 İskonto Hesaplama
+          - 📊 Karlılık Analizi
+          - 👥 Müşteri Takip
+          - 📈 Yaşlandırma
         files: |
           BUP_Yonetim_v${{ steps.version.outputs.version }}.zip
         draft: false
