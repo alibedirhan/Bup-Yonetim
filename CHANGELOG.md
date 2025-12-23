@@ -2,6 +2,23 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.1] - 2024-12-23
+
+### 🔧 Düzeltmeler
+- **Karlılık Analizi**: "Analiz modülü yüklenemedi" hatası düzeltildi
+  - Import yolları düzeltildi (relative/absolute fallback)
+  - `__init__.py` dosyasına modül export'ları eklendi
+- **Yaşlandırma**: Dosya yükleme sonrası hata düzeltildi
+  - Import yolları düzeltildi
+  - Modül yükleme sırası düzenlendi
+- **Müşteri Takip**: Araç-Plasiyer resim/excel kaydetme sorunu analiz edildi
+- **PyInstaller**: Tüm proje modülleri hidden imports'a eklendi
+
+### 📦 Teknik Değişiklikler
+- `KARLILIK_ANALIZI/__init__.py`: KarlilikAnalizi export eklendi
+- `YASLANDIRMA/__init__.py`: ExcelProcessor export eklendi
+- `BUP_Yonetim.spec`: 30+ proje modülü hidden imports'a eklendi
+
 ## [3.2.0] - 2024-12-23
 
 ### 🔧 Düzeltmeler

@@ -21,9 +21,5 @@ Pillow>=10.0.0
 # Utilities
 python-dateutil>=2.8.0
 
-
 # Build Tools (dev only)
 pyinstaller>=6.0.0
-fpdf2>=2.7.0
-seaborn>=0.13.0
-

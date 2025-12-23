@@ -1823,7 +1823,13 @@ class KarlilikApp(ctk.CTkFrame):
     def _load_module(self):
         """Modül yükle"""
         try:
-            from karlilik import KarlilikAnalizi
+            # Önce relative import dene
+            try:
+                from .karlilik import KarlilikAnalizi
+            except ImportError:
+                # Fallback: absolute import
+                from karlilik import KarlilikAnalizi
+            
             self.analiz = KarlilikAnalizi(
                 progress_callback=self._on_progress,
                 log_callback=self._on_log
@@ -1831,6 +1837,9 @@ class KarlilikApp(ctk.CTkFrame):
             logger.info("KarlilikAnalizi yüklendi")
         except ImportError as e:
             logger.error(f"Modül yüklenemedi: {e}")
+            self.analiz = None
+        except Exception as e:
+            logger.error(f"Modül yükleme hatası: {e}")
             self.analiz = None
     
     def _on_progress(self, value: int, status: str):

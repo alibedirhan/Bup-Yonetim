@@ -301,18 +301,29 @@ class YaslandirmaApp(ctk.CTkFrame):
         """Alt modülleri yükle"""
         try:
             # Excel Processor (zorunlu)
-            from excel_processor import ExcelProcessor, ExcelProcessorError
+            try:
+                from .excel_processor import ExcelProcessor, ExcelProcessorError
+            except ImportError:
+                from excel_processor import ExcelProcessor, ExcelProcessorError
+            
             self.processor = ExcelProcessor()
             self.ExcelProcessorError = ExcelProcessorError
             logger.info("ExcelProcessor yüklendi")
             
             # Analiz modülleri (opsiyonel)
             try:
-                from modules.analysis import AnalysisEngine
-                from modules.assignment import AssignmentManager
-                from modules.data_manager import DataManager
-                from modules.reports import ReportGenerator
-                from modules.visualization import VisualizationEngine
+                try:
+                    from .modules.analysis import AnalysisEngine
+                    from .modules.assignment import AssignmentManager
+                    from .modules.data_manager import DataManager
+                    from .modules.reports import ReportGenerator
+                    from .modules.visualization import VisualizationEngine
+                except ImportError:
+                    from modules.analysis import AnalysisEngine
+                    from modules.assignment import AssignmentManager
+                    from modules.data_manager import DataManager
+                    from modules.reports import ReportGenerator
+                    from modules.visualization import VisualizationEngine
                 
                 self.analysis_engine = AnalysisEngine()
                 self.assignment_manager = AssignmentManager()

@@ -1,51 +1,196 @@
+# BUP-ALL-IN-ONE Windows EXE Build Workflow
+# Bu workflow her release tag'inde veya manuel tetiklemede çalışır
+
 name: Build Windows EXE
 
 on:
-  workflow_dispatch:
   push:
     tags:
-      - "v*"
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 3.2.0)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: windows-latest
-
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    # ========================================
+    # CHECKOUT
+    # ========================================
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"
+    # ========================================
+    # PYTHON SETUP
+    # ========================================
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install -U pip wheel setuptools
-          pip install -r requirements.txt
-          pip install pyinstaller
+    # ========================================
+    # DEPENDENCIES
+    # ========================================
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip wheel setuptools
+        pip install -r requirements.txt
+        pip install pyinstaller>=6.0.0
+        
+        # Verify installations
+        python -c "import customtkinter; print(f'CustomTkinter: {customtkinter.__version__}')"
+        python -c "import pandas; print(f'Pandas: {pandas.__version__}')"
+        python -c "import pdfplumber; print('pdfplumber: OK')"
+        python -c "import fpdf; print('fpdf: OK')"
+        python -c "import matplotlib; print(f'Matplotlib: {matplotlib.__version__}')"
+        python -c "import openpyxl; print(f'Openpyxl: {openpyxl.__version__}')"
 
-      - name: Build EXE (PyInstaller)
-        shell: pwsh
-        run: |
-          pyinstaller `
-            --noconsole `
-            --onefile `
-            --name "BUP_Yonetim" `
-            --paths "." `
-            --collect-all customtkinter `
-            --collect-submodules shared `
-            --collect-submodules ISKONTO_HESABI `
-            --collect-submodules KARLILIK_ANALIZI `
-            --collect-submodules Musteri_Sayisi_Kontrolu `
-            --collect-submodules YASLANDIRMA `
-            --add-data "assets;assets" `
-            main.py
+    # ========================================
+    # VERSION DETECTION
+    # ========================================
+    - name: Get version
+      id: version
+      shell: bash
+      run: |
+        if [ -n "${{ github.event.inputs.version }}" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          echo "version=$(cat VERSION | tr -d '\n\r')" >> $GITHUB_OUTPUT
+        fi
 
+    # ========================================
+    # BUILD EXE
+    # ========================================
+    - name: Build EXE with PyInstaller
+      run: |
+        # Clean previous builds
+        if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
+        if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
+        
+        # Build using spec file
+        pyinstaller BUP_Yonetim.spec --clean --noconfirm
+        
+        # Verify build
+        if (Test-Path "dist/BUP_Yonetim.exe") {
+          $size = (Get-Item "dist/BUP_Yonetim.exe").Length / 1MB
+          Write-Host "Build successful! EXE size: $([math]::Round($size, 2)) MB"
+        } else {
+          Write-Error "Build failed - EXE not found!"
+          exit 1
+        }
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BUP_Yonetim_windows_exe
-          path: dist/BUP_Yonetim.exe
+    # ========================================
+    # CREATE RELEASE PACKAGE
+    # ========================================
+    - name: Create release package
+      run: |
+        $version = "${{ steps.version.outputs.version }}"
+        $releaseDir = "BUP_Yonetim_v$version"
+        
+        # Create release directory
+        New-Item -ItemType Directory -Force -Path $releaseDir
+        
+        # Copy EXE
+        Copy-Item "dist/BUP_Yonetim.exe" "$releaseDir/"
+        
+        # Create empty directories for user data
+        New-Item -ItemType Directory -Force -Path "$releaseDir/data"
+        New-Item -ItemType Directory -Force -Path "$releaseDir/data/backups"
+        New-Item -ItemType Directory -Force -Path "$releaseDir/logs"
+        New-Item -ItemType Directory -Force -Path "$releaseDir/exports"
+        New-Item -ItemType Directory -Force -Path "$releaseDir/exports/excel"
+        New-Item -ItemType Directory -Force -Path "$releaseDir/exports/pdf"
+        
+        # Create README
+        @"
+        ========================================
+        BUPİLİÇ İŞLETME YÖNETİM SİSTEMİ v$version
+        ========================================
+        
+        KURULUM:
+        1. Bu klasörü istediğiniz yere çıkarın
+        2. BUP_Yonetim.exe dosyasını çalıştırın
+        
+        KLASÖR YAPISI:
+        - data/       : Uygulama verileri
+        - logs/       : Log dosyaları
+        - exports/    : Dışa aktarılan dosyalar
+          - excel/    : Excel dosyaları
+          - pdf/      : PDF dosyaları
+        
+        MODÜLLER:
+        - İskonto Hesaplama: PDF fiyat listelerinden iskonto hesaplama
+        - Karlılık Analizi: Excel tabanlı karlılık raporları
+        - Müşteri Takip: Dönem bazlı müşteri karşılaştırma
+        - Yaşlandırma: Cari hesap yaşlandırma analizi
+        
+        GEREKSINIMLER:
+        - Windows 10/11 (64-bit)
+        - Ekstra kurulum gerekmez!
+        
+        SORUN BILDIRIMI:
+        logs/ klasöründeki dosyaları inceleyebilirsiniz.
+        
+        © 2024-2025 Ali Bedirhan
+        "@ | Out-File -FilePath "$releaseDir/README.txt" -Encoding UTF8
+        
+        # Create ZIP
+        Compress-Archive -Path "$releaseDir/*" -DestinationPath "BUP_Yonetim_v$version.zip" -Force
+        
+        Write-Host "Release package created: BUP_Yonetim_v$version.zip"
+
+    # ========================================
+    # UPLOAD ARTIFACTS (for non-tag builds)
+    # ========================================
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: BUP_Yonetim_v${{ steps.version.outputs.version }}
+        path: BUP_Yonetim_v${{ steps.version.outputs.version }}.zip
+        retention-days: 30
+
+    # ========================================
+    # CREATE GITHUB RELEASE (only for tags)
+    # ========================================
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        name: BUP Yönetim v${{ steps.version.outputs.version }}
+        body: |
+          ## 🚀 BUPİLİÇ İşletme Yönetim Sistemi v${{ steps.version.outputs.version }}
+          
+          ### 📦 İndirme
+          Aşağıdaki ZIP dosyasını indirip çıkarın, ardından `BUP_Yonetim.exe` dosyasını çalıştırın.
+          
+          ### ✨ Özellikler
+          - 💰 **İskonto Hesaplama**: PDF fiyat listelerinden otomatik iskonto hesaplama
+          - 📊 **Karlılık Analizi**: Detaylı karlılık raporları ve dashboard
+          - 👥 **Müşteri Takip**: Dönem bazlı müşteri karşılaştırma
+          - 📈 **Yaşlandırma**: Cari hesap yaşlandırma analizi
+          
+          ### 💻 Sistem Gereksinimleri
+          - Windows 10/11 (64-bit)
+          - Ekstra kurulum gerekmez!
+          
+          ### 📋 Değişiklikler
+          Bu sürümde yapılan değişiklikler için [CHANGELOG](CHANGELOG.md) dosyasına bakın.
+        files: |
+          BUP_Yonetim_v${{ steps.version.outputs.version }}.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
