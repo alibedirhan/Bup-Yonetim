@@ -2,6 +2,44 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.8] - 2024-12-24
+
+### 🔧 KRİTİK DÜZELTMELER - Tema ve Ayarlar
+
+#### Aydınlık/Karanlık Tema Sorunu ✅ ÇÖZÜLDÜ
+- `ctk.set_appearance_mode()` çağrısı düzgün çalışıyor
+- Ana pencere arka plan rengi manuel güncelleniyor (dark: #1a1a2e)
+- Tema değişikliği anında uygulanıyor
+- Logger ile tema değişiklikleri loglanıyor
+
+#### Ayarlar Penceresi Donma Sorunu ✅ ÇÖZÜLDÜ
+- **`grab_set()` KALDIRILDI** - Bu donmaya neden oluyordu!
+- Bunun yerine `focus_force()` ve `lift()` kullanılıyor
+- Pencere referansı `_settings_window` ile takip ediliyor
+- Çoklu pencere açılması engellendi
+
+#### Tavuk Animasyonu İyileştirmeleri
+- Animasyon sırasında buton disabled yapılıyor
+- Hata durumunda animasyon düzgün sonlanıyor
+- 60ms frame süresi (daha akıcı)
+
+### 📝 Teknik Detaylar
+```python
+# ESKİ (SORUNLU):
+settings.grab_set()  # BU DONMAYA NEDEN OLUYORDU!
+
+# YENİ (ÇÖZÜM):
+settings.focus_force()
+settings.lift()
+# grab_set KULLANILMIYOR!
+```
+
+### 🎯 Test Edilmesi Gerekenler
+1. Tavuk ikonuna tıkla → Animasyon + Tema değişmeli
+2. Ayarlar → Tema seç → Hemen uygulanmalı
+3. Ayarlar → Kapat → Program donmamalı
+4. Dark modda arka plan koyu olmalı
+
 ## [3.2.7] - 2024-12-24
 
 ### 🎨 Ana Ekran Geliştirmeleri

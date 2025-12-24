@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.2.7"
+APP_VERSION = "3.2.8"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -258,9 +258,10 @@ class BupilicMainApp(ctk.CTk):
         self.is_dark_mode = False
         
         # Tavuk animasyonu için
-        self.chicken_frames = ["🐔", "🐓", "🐤", "🐣"]
-        self.chicken_frame_index = 0
         self.animating = False
+        
+        # Ayarlar penceresi referansı
+        self._settings_window = None
         
         # Modül pencereleri
         self.module_windows: Dict[str, ctk.CTkToplevel] = {}
@@ -557,7 +558,7 @@ class BupilicMainApp(ctk.CTk):
         # Tema butonu - Tavuk animasyonlu
         self.theme_btn = ctk.CTkButton(
             btn_frame,
-            text="🐔",  # Tavuk ikonu
+            text="🐔",  # Tavuk ikonu - Gündüz
             width=45,
             height=45,
             corner_radius=22,
@@ -565,7 +566,7 @@ class BupilicMainApp(ctk.CTk):
             hover_color=MODERN_COLORS['border'],
             text_color=MODERN_COLORS['text_secondary'],
             font=ctk.CTkFont(size=20),
-            command=self._toggle_theme_animated
+            command=self._toggle_theme_with_animation
         )
         self.theme_btn.pack(side="left", padx=(0, 10))
         
@@ -580,87 +581,140 @@ class BupilicMainApp(ctk.CTk):
             hover_color=MODERN_COLORS['border'],
             text_color=MODERN_COLORS['text_secondary'],
             font=ctk.CTkFont(family="Segoe UI", size=12),
-            command=self._show_settings
+            command=self._open_settings_safe
         ).pack(side="left")
     
     # =========================================================================
-    # TEMA VE AYARLAR
+    # TEMA DEĞİŞTİRME - PROFESYONEl ÇÖZÜM
     # =========================================================================
     
-    def _toggle_theme_animated(self):
+    def _toggle_theme_with_animation(self):
         """Tema değiştir - Tavuk animasyonlu"""
         if self.animating:
             return
         
         self.animating = True
-        self._animate_chicken(0)
+        self.theme_btn.configure(state="disabled")
+        self._run_chicken_animation(0)
     
-    def _animate_chicken(self, step: int):
-        """Tavuk animasyonu"""
-        if step < 8:  # 8 frame animasyon
-            # Tavuk frame'leri arasında geçiş
-            frames = ["🐔", "🐓", "🥚", "🐣", "🐤", "🐥", "🐔", "🐓"]
-            self.theme_btn.configure(text=frames[step % len(frames)])
-            self.after(80, lambda: self._animate_chicken(step + 1))
-        else:
-            # Animasyon bitti, tema değiştir
-            self.is_dark_mode = not self.is_dark_mode
-            
-            if self.is_dark_mode:
-                ctk.set_appearance_mode("dark")
-                self.theme_btn.configure(text="🌜")  # Gece tavuğu
-            else:
-                ctk.set_appearance_mode("light")
-                self.theme_btn.configure(text="🐔")  # Gündüz tavuğu
-            
-            self.animating = False
-    
-    def _toggle_theme(self):
-        """Tema değiştir - Basit versiyon"""
-        self.is_dark_mode = not self.is_dark_mode
+    def _run_chicken_animation(self, step: int):
+        """Tavuk animasyonu - 8 frame"""
+        frames = ["🐔", "🐓", "🥚", "🐣", "🐤", "🐥", "🐔", "🐓"]
         
-        if self.is_dark_mode:
-            ctk.set_appearance_mode("dark")
-            self.theme_btn.configure(text="🌜")
+        if step < len(frames):
+            try:
+                self.theme_btn.configure(text=frames[step])
+                self.after(60, lambda: self._run_chicken_animation(step + 1))
+            except:
+                self._finish_theme_change()
         else:
-            ctk.set_appearance_mode("light")
-            self.theme_btn.configure(text="🐔")
+            self._finish_theme_change()
     
-    def _show_settings(self):
-        """Gelişmiş ayarlar penceresi"""
-        settings = ctk.CTkToplevel(self)
+    def _finish_theme_change(self):
+        """Animasyon bitince tema değiştir"""
+        try:
+            # Tema değiştir
+            self.is_dark_mode = not self.is_dark_mode
+            new_mode = "dark" if self.is_dark_mode else "light"
+            
+            # CustomTkinter tema değiştir
+            ctk.set_appearance_mode(new_mode)
+            
+            # İkon güncelle
+            icon = "🌜" if self.is_dark_mode else "🐔"
+            self.theme_btn.configure(text=icon, state="normal")
+            
+            # Ana pencere rengini güncelle
+            if self.is_dark_mode:
+                self.configure(fg_color="#1a1a2e")
+            else:
+                self.configure(fg_color=MODERN_COLORS['bg_primary'])
+            
+            logger.info(f"Tema değiştirildi: {new_mode}")
+            
+        except Exception as e:
+            logger.error(f"Tema değiştirme hatası: {e}")
+        finally:
+            self.animating = False
+            self.theme_btn.configure(state="normal")
+    
+    def _apply_theme_direct(self, theme: str):
+        """Tema uygula - Ayarlar penceresinden"""
+        try:
+            mode = theme.lower()
+            if mode == "system":
+                mode = "system"
+            
+            ctk.set_appearance_mode(mode)
+            self.is_dark_mode = (theme == "Dark")
+            
+            # Ana buton ikonunu güncelle
+            self.theme_btn.configure(text="🌜" if self.is_dark_mode else "🐔")
+            
+            # Ana pencere rengini güncelle
+            if self.is_dark_mode:
+                self.configure(fg_color="#1a1a2e")
+            else:
+                self.configure(fg_color=MODERN_COLORS['bg_primary'])
+                
+            logger.info(f"Tema uygulandı: {theme}")
+            
+        except Exception as e:
+            logger.error(f"Tema uygulama hatası: {e}")
+    
+    # =========================================================================
+    # AYARLAR PENCERESİ - DONMA SORUNUNU ÇÖZEN VERSİYON
+    # =========================================================================
+    
+    def _open_settings_safe(self):
+        """Ayarlar penceresini güvenli şekilde aç"""
+        # Zaten açık mı kontrol et
+        if hasattr(self, '_settings_window') and self._settings_window is not None:
+            try:
+                if self._settings_window.winfo_exists():
+                    self._settings_window.focus_force()
+                    self._settings_window.lift()
+                    return
+            except:
+                pass
+        
+        # Yeni pencere oluştur
+        self._create_settings_window()
+    
+    def _create_settings_window(self):
+        """Ayarlar penceresini oluştur - grab_set KULLANMADAN"""
+        self._settings_window = ctk.CTkToplevel(self)
+        settings = self._settings_window
+        
         settings.title("⚙️ Ayarlar")
-        settings.geometry("500x600")
-        settings.transient(self)
+        settings.geometry("500x550")
         settings.resizable(False, False)
         
         # Pencereyi ortala
-        settings.update_idletasks()
+        self.update_idletasks()
         x = self.winfo_x() + (self.winfo_width() - 500) // 2
-        y = self.winfo_y() + (self.winfo_height() - 600) // 2
-        settings.geometry(f"+{x}+{y}")
+        y = self.winfo_y() + (self.winfo_height() - 550) // 2
+        settings.geometry(f"500x550+{x}+{y}")
         
-        # Kapanma protokolü - grab_release önemli!
-        def on_close():
+        # transient - ana pencereyle ilişkilendir
+        settings.transient(self)
+        
+        # Kapanma işlemi
+        def close_settings():
             try:
-                settings.grab_release()
+                self._settings_window = None
+                settings.destroy()
             except:
                 pass
-            settings.destroy()
         
-        settings.protocol("WM_DELETE_WINDOW", on_close)
+        settings.protocol("WM_DELETE_WINDOW", close_settings)
         
-        # grab_set için pencere görünür olana kadar bekle
-        def do_grab():
-            try:
-                if settings.winfo_exists():
-                    settings.grab_set()
-                    settings.focus_force()
-            except:
-                pass
-        settings.after(200, do_grab)
+        # ÖNEMLİ: grab_set KULLANMIYORUZ - donmaya neden oluyor!
+        # Bunun yerine focus ve lift kullanıyoruz
+        settings.focus_force()
+        settings.lift()
         
-        # Ana container - basit frame
+        # === UI İÇERİĞİ ===
         main = ctk.CTkFrame(settings, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=25, pady=25)
         
@@ -702,14 +756,17 @@ class BupilicMainApp(ctk.CTk):
             width=120, anchor="w"
         ).pack(side="left")
         
-        self.theme_selector = ctk.CTkSegmentedButton(
+        # Mevcut temayı belirle
+        current_theme = "Dark" if self.is_dark_mode else "Light"
+        
+        theme_selector = ctk.CTkSegmentedButton(
             theme_row,
             values=["Light", "Dark", "System"],
-            command=self._apply_theme,
+            command=self._apply_theme_direct,
             font=ctk.CTkFont(size=11)
         )
-        self.theme_selector.set("Light" if not self.is_dark_mode else "Dark")
-        self.theme_selector.pack(side="right")
+        theme_selector.set(current_theme)
+        theme_selector.pack(side="right")
         
         # === PROGRAM KARTI ===
         program_card = ctk.CTkFrame(main, corner_radius=12)
@@ -724,37 +781,23 @@ class BupilicMainApp(ctk.CTk):
             font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold")
         ).pack(anchor="w", pady=(0, 15))
         
-        # Başlangıç modülü
-        startup_row = ctk.CTkFrame(prog_inner, fg_color="transparent")
-        startup_row.pack(fill="x", pady=5)
+        # Versiyon bilgisi
+        version_row = ctk.CTkFrame(prog_inner, fg_color="transparent")
+        version_row.pack(fill="x", pady=5)
         
         ctk.CTkLabel(
-            startup_row,
-            text="Başlangıç Modülü:",
+            version_row,
+            text="Versiyon:",
             font=ctk.CTkFont(family="Segoe UI", size=12),
-            width=140, anchor="w"
+            width=120, anchor="w"
         ).pack(side="left")
         
-        ctk.CTkOptionMenu(
-            startup_row,
-            values=["Ana Menü", "Karlılık Analizi", "İskonto", "Müşteri Takip", "Yaşlandırma"],
-            width=180
+        ctk.CTkLabel(
+            version_row,
+            text=f"v{APP_VERSION}",
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+            text_color="#3B82F6"
         ).pack(side="right")
-        
-        # Son dosyaları hatırla
-        remember_row = ctk.CTkFrame(prog_inner, fg_color="transparent")
-        remember_row.pack(fill="x", pady=10)
-        
-        ctk.CTkLabel(
-            remember_row,
-            text="Son dosyaları hatırla:",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
-            width=140, anchor="w"
-        ).pack(side="left")
-        
-        remember_switch = ctk.CTkSwitch(remember_row, text="", width=40)
-        remember_switch.select()
-        remember_switch.pack(side="right")
         
         # === HAKKINDA KARTI ===
         about_card = ctk.CTkFrame(main, corner_radius=12)
@@ -771,30 +814,24 @@ class BupilicMainApp(ctk.CTk):
         
         ctk.CTkLabel(
             about_inner,
-            text="🐔 Bupiliç İşletme Yönetim Sistemi\n"
-                 "Versiyon: 3.1 Modern Edition\n"
-                 "Geliştirici: Ali Bedirhan\n"
-                 "© 2024-2025",
+            text=f"🐔 Bupiliç İşletme Yönetim Sistemi\n"
+                 f"Versiyon: {APP_VERSION}\n"
+                 f"Geliştirici: Ali Bedirhan\n"
+                 f"© 2024-2025",
             font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color="#64748B",
             justify="left"
         ).pack(anchor="w")
         
-        # Kapat butonu - on_close kullan
+        # Kapat butonu
         ctk.CTkButton(
             main,
             text="Kapat",
             width=120,
             height=40,
             corner_radius=20,
-            command=on_close
+            command=close_settings
         ).pack(side="bottom", pady=(20, 0))
-    
-    def _apply_theme(self, theme: str):
-        """Tema uygula"""
-        ctk.set_appearance_mode(theme.lower())
-        self.is_dark_mode = (theme == "Dark")
-        self.theme_btn.configure(text="🌜" if self.is_dark_mode else "🐔")
     
     # =========================================================================
     # MODÜL AÇMA
