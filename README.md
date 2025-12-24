@@ -6,6 +6,7 @@
 
 Tavukçuluk sektörü için modern işletme yönetim sistemi.
 
+
 ### v3.3.2 Notları
 - UI içi PNG ikonlar (header + modül kartları)
 - Layout stabilizasyonu (kırpma sorunu giderildi)
@@ -22,6 +23,19 @@ Tavukçuluk sektörü için modern işletme yönetim sistemi.
 | 📊 Karlılık Analizi | Şube ve ürün bazlı karlılık raporları + Dashboard |
 | 👥 Müşteri Takip | Dönem bazlı müşteri karşılaştırma ve trend takibi |
 | 📈 Yaşlandırma | Cari hesap yaşlandırma ve raporlama |
+
+## Arayüz
+
+<p align="center">
+  <img src="docs/media/ui.png" alt="BUP-YONETIM arayüz" width="900">
+</p>
+
+## Kısa Demo
+
+<p align="center">
+  <img src="docs/media/demo.gif" alt="BUP-YONETIM demo" width="900">
+</p>
+
 
 ## 💻 Sistem Gereksinimleri
 
