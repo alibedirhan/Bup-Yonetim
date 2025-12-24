@@ -2,6 +2,15 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+
+## [3.3.2] - 2025-12-25 🖼️ PNG UI İKONLARI
+
+### ✅ Düzeltmeler
+- Header (Bupiliç) sol logo PNG olarak eklendi ve düzgün hizalandı
+- Modül kart ikonları PNG oldu (İskonto, Karlılık, Müşteri Takip, Yaşlandırma)
+- Kırpılma sorunu giderildi (sabit width/height + pack(expand=True))
+- Linux & Windows görünümü tutarlı hale getirildi
+
 ## [3.3.0] - 2024-12-24 🎨 MAJOR TEMA GÜNCELLEMESİ
 
 ### ✨ YENİ: Profesyonel Tema Sistemi

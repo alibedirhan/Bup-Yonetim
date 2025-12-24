@@ -93,11 +93,14 @@ SUPPORTED_EXTENSIONS = ['.xlsx', '.xls']
 # Logger setup
 try:
     from shared.utils import setup_logging
+    from shared.utils import apply_window_icon
     logger = setup_logging("MUSTERI_UI")
 except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger("MUSTERI_UI")
+    def apply_window_icon(*_a, **_k):
+        return
 
 
 # =============================================================================
@@ -117,6 +120,12 @@ class VehicleDriverDialog(ctk.CTkToplevel):
     
     def __init__(self, parent, existing_data: Optional[Dict[str, str]] = None):
         super().__init__(parent)
+
+        # Title bar/taskbar ikonu (ana uygulama ile tutarlı)
+        apply_window_icon(self, prefer_chicken=True)
+
+        # İkon (tüm dialog'larda tutarlı olsun)
+        apply_window_icon(self, prefer_chicken=True)
         
         # Veri
         self.existing_data = existing_data or {}

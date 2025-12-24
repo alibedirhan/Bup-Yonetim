@@ -1,10 +1,14 @@
-# 🐔 Bupiliç Yönetim Sistemi v3.2
+# 🐔 Bupiliç Yönetim Sistemi v3.3.2
 
 [![Build](https://github.com/alibedirhan/Bup-Yonetim/actions/workflows/build.yml/badge.svg)](https://github.com/alibedirhan/Bup-Yonetim/actions)
 [![Release](https://img.shields.io/github/v/release/alibedirhan/Bup-Yonetim)](https://github.com/alibedirhan/Bup-Yonetim/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/alibedirhan/Bup-Yonetim/total)](https://github.com/alibedirhan/Bup-Yonetim/releases)
 
 Tavukçuluk sektörü için modern işletme yönetim sistemi.
+
+### v3.3.2 Notları
+- UI içi PNG ikonlar (header + modül kartları)
+- Layout stabilizasyonu (kırpma sorunu giderildi)
 
 ## 📥 İndirme
 

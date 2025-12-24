@@ -73,6 +73,71 @@ def get_resource_path(relative_path: str) -> Path:
     
     return resource_path  # Varsayılan döndür (olmasa bile)
 
+# =========================================================================
+# UYGULAMA / PENCERE İKONU
+# =========================================================================
+
+def apply_window_icon(
+    window: _tk.Misc,
+    *,
+    prefer_chicken: bool = True,
+    ico_rel: str = "assets/bupilic.ico",
+    png_rel: str = "assets/tavuk.png",
+    fallback_png_rel: str = "assets/bupilic.png",
+) -> None:
+    """Verilen Tk/CTk penceresine ikon uygula (Windows + Linux).
+
+    - Windows'ta mümkünse PNG'den ICO üretip iconbitmap ile set eder (title bar/taskbar).
+    - Tüm platformlarda iconphoto ile de set eder (özellikle Linux).
+
+    Not: PhotoImage referansı GC ile silinmesin diye pencere üzerinde saklanır.
+    """
+    try:
+        # Kaynakları bul
+        png_path = get_resource_path(png_rel)
+        if not png_path.exists():
+            png_path = get_resource_path(fallback_png_rel)
+
+        ico_path = get_resource_path(ico_rel)
+
+        # 1) Windows: tavuk PNG varsa ICO üret (tavuk ikon istendiği için)
+        if sys.platform.startswith("win"):
+            try:
+                if prefer_chicken and png_path.exists():
+                    # Data dizinine cache'le (exe yanında yazılabilir alan)
+                    out_ico = get_data_dir() / "app_icon_chicken.ico"
+                    if (not out_ico.exists()) or (out_ico.stat().st_size < 1024):
+                        from PIL import Image  # lazy
+                        img = Image.open(png_path).convert("RGBA")
+                        # Çoklu boyut üret
+                        img.save(
+                            out_ico,
+                            format="ICO",
+                            sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)],
+                        )
+                    window.iconbitmap(str(out_ico))
+                elif ico_path.exists():
+                    window.iconbitmap(str(ico_path))
+            except Exception:
+                # iconbitmap başarısız olursa devam
+                pass
+
+        # 2) iconphoto (Linux'ta kritik, Windows'ta da işe yarar)
+        if png_path.exists():
+            try:
+                from PIL import Image, ImageTk  # lazy
+                img = Image.open(png_path)
+                photo = ImageTk.PhotoImage(img)
+                window.iconphoto(True, photo)
+                # Referansı tut
+                setattr(window, "_bup_icon_photo", photo)
+            except Exception:
+                pass
+
+    except Exception:
+        # İkon ayarlaması hiçbir zaman uygulamayı düşürmemeli
+        return
+
 # ============================================================================
 # LOGGING SİSTEMİ
 # ============================================================================

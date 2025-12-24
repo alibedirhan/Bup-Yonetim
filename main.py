@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 BUP-ALL-IN-ONE Ana Program
-Tüm modülleri birleştiren modern arayüz - v3.3.0
+Tüm modülleri birleştiren modern arayüz - v3.3.2
 """
 
 import sys
@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.3.1"
+APP_VERSION = "3.3.2"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).parent
 sys.path.insert(0, str(BASE_DIR))
 
 # Uygulama genel fix'leri (Tk float/locale + logging + crash hook)
-from shared.utils import initialize_app
+from shared.utils import initialize_app, apply_window_icon
 logger = initialize_app("BUP_MAIN")
 
 import customtkinter as ctk
@@ -205,7 +205,10 @@ class ModernModuleCard(ctk.CTkFrame):
                 self.icon_label = ctk.CTkLabel(
                     self.icon_frame,
                     image=self.icon_image,
-                    text=""
+                    text="",
+                    width=56,
+                    height=56,
+                    anchor="center",
                 )
             else:
                 # Fallback: Baş harf
@@ -224,7 +227,7 @@ class ModernModuleCard(ctk.CTkFrame):
                 text_color=self.accent_color
             )
         
-        self.icon_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.icon_label.pack(expand=True)
         
         # Başlık
         self.title_label = ctk.CTkLabel(
@@ -397,23 +400,8 @@ class BupilicMainApp(ctk.CTk):
     
     def _set_app_icon(self):
         """Program ikonunu ayarla"""
-        try:
-            icon_path = BASE_DIR / "assets" / "bupilic.ico"
-            if icon_path.exists():
-                self.iconbitmap(str(icon_path))
-                logger.info("Program ikonu ayarlandı")
-            else:
-                # PNG ile dene (Linux/Mac için)
-                png_path = BASE_DIR / "assets" / "bupilic.png"
-                if png_path.exists():
-                    from PIL import Image, ImageTk
-                    img = Image.open(png_path)
-                    photo = ImageTk.PhotoImage(img)
-                    self.iconphoto(True, photo)
-                    self._icon_photo = photo  # Referansı tut
-                    logger.info("Program ikonu (PNG) ayarlandı")
-        except Exception as e:
-            logger.warning(f"İkon ayarlanamadı: {e}")
+        # Tavuk ikonu öncelikli (title bar/taskbar sol üst)
+        apply_window_icon(self, prefer_chicken=True)
     
     def _setup_ui(self):
         """Tüm UI bileşenlerini oluştur"""
@@ -439,6 +427,7 @@ class BupilicMainApp(ctk.CTk):
         dialog.geometry("400x200")
         dialog.transient(self)
         dialog.after(100, dialog.grab_set)
+        apply_window_icon(dialog, prefer_chicken=True)
         
         ctk.CTkLabel(
             dialog,
@@ -513,7 +502,10 @@ class BupilicMainApp(ctk.CTk):
                 self.logo_label = ctk.CTkLabel(
                     logo_bg,
                     image=self.logo_image,
-                    text=""
+                    text="",
+                    width=50,
+                    height=50,
+                    anchor="center",
                 )
             else:
                 self.logo_label = ctk.CTkLabel(
@@ -530,7 +522,7 @@ class BupilicMainApp(ctk.CTk):
                 font=ctk.CTkFont(family="Segoe UI", size=28, weight="bold"),
                 text_color="#FFFFFF"
             )
-        self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.logo_label.pack(expand=True)
         
         # Başlık metinleri
         title_frame = ctk.CTkFrame(left, fg_color="transparent")
@@ -569,7 +561,7 @@ class BupilicMainApp(ctk.CTk):
         
         ctk.CTkLabel(
             version_badge,
-            text="  v3.1  ",
+            text=f"  v{APP_VERSION}  ",
             font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color="#B8C9E0"
         ).pack(padx=6, pady=3)
@@ -918,6 +910,9 @@ class BupilicMainApp(ctk.CTk):
         
         # transient - ana pencereyle ilişkilendir
         settings.transient(self)
+
+        # İkon (tüm alt pencerelerde tavuk ikonunu garanti et)
+        apply_window_icon(settings, prefer_chicken=True)
         
         # Kapanma işlemi
         def close_settings():
@@ -1129,6 +1124,7 @@ class BupilicMainApp(ctk.CTk):
                 window.title(f"Bupiliç - {display_name}")
                 window.geometry("1200x800")
                 window.minsize(1000, 700)
+                apply_window_icon(window, prefer_chicken=True)
                 
                 from ISKONTO_HESABI.ui import IskontoHesabiApp
                 app = IskontoHesabiApp(window)
@@ -1142,6 +1138,7 @@ class BupilicMainApp(ctk.CTk):
                 window.title(f"Bupiliç - {display_name}")
                 window.geometry("1200x800")
                 window.minsize(1000, 700)
+                apply_window_icon(window, prefer_chicken=True)
                 
                 musteri_path = BASE_DIR / "Musteri_Sayisi_Kontrolu"
                 if str(musteri_path) not in sys.path:
@@ -1166,6 +1163,7 @@ class BupilicMainApp(ctk.CTk):
                 window.title(f"Bupiliç - {display_name}")
                 window.geometry("1400x900")
                 window.minsize(1200, 800)
+                apply_window_icon(window, prefer_chicken=True)
                 
                 yaslandirma_path = BASE_DIR / "YASLANDIRMA"
                 for p in [yaslandirma_path, yaslandirma_path / "gui", yaslandirma_path / "modules"]:
@@ -1193,6 +1191,7 @@ class BupilicMainApp(ctk.CTk):
             window.title(f"Bupiliç - {display_name}")
             window.geometry("1400x900")
             window.minsize(1200, 800)
+            apply_window_icon(window, prefer_chicken=True)
             
             karlilik_path = BASE_DIR / "KARLILIK_ANALIZI"
             if str(karlilik_path) not in sys.path:

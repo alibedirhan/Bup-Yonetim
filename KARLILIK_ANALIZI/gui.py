@@ -19,6 +19,13 @@ import queue
 import logging
 from datetime import datetime
 
+# İkon helper
+try:
+    from shared.utils import apply_window_icon
+except Exception:
+    def apply_window_icon(*_a, **_k):
+        return
+
 # Frozen mode için import düzeltmesi
 try:
     from .karlilik import KarlilikAnalizi
@@ -43,6 +50,7 @@ class BupilicKarlilikGUI:
                 self.root = tk.Tk()
 
         self.root.title("Karlılık Analizi")
+        apply_window_icon(self.root, prefer_chicken=True)
         
         self.root.title("Bupiliç Karlılık Analizi - CAL")
         self.root.geometry("1200x800")

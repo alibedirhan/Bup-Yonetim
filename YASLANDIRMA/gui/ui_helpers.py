@@ -31,6 +31,13 @@ except Exception:
 
 import customtkinter as ctk
 
+# İkon helper
+try:
+    from shared.utils import apply_window_icon
+except Exception:
+    def apply_window_icon(*_a, **_k):
+        return
+
 # CustomTkinter DPI/scaling bazen float üretebiliyor -> sabitle
 try:
     ctk.set_widget_scaling(1.0)
@@ -280,6 +287,7 @@ def show_help_dialog(parent):
         help_window.title("Kullanım Kılavuzu")
         help_window.geometry("700x600")
         help_window.transient(parent)
+        apply_window_icon(help_window, prefer_chicken=True)
         
         # Scrollable text
         textbox = ctk.CTkTextbox(help_window)
@@ -300,6 +308,7 @@ def show_about_dialog(parent):
         about_window.geometry("500x400")
         
         about_window.transient(parent)
+        apply_window_icon(about_window, prefer_chicken=True)
         about_window.after(100, lambda: about_window.grab_set())
         about_window.focus()
         
@@ -346,6 +355,7 @@ def show_quick_help(gui_instance):
     help_window.title("Hızlı Yardım")
     help_window.geometry("600x400")
     help_window.transient(gui_instance.root)
+    apply_window_icon(help_window, prefer_chicken=True)
     help_window.grab_set()
     
     # İçerik
@@ -408,6 +418,7 @@ def show_keyboard_shortcuts(gui_instance):
     shortcuts_window.title("Klavye Kısayolları")
     shortcuts_window.geometry("500x300")
     shortcuts_window.transient(gui_instance.root)
+    apply_window_icon(shortcuts_window, prefer_chicken=True)
     shortcuts_window.grab_set()
     
     # İçerik

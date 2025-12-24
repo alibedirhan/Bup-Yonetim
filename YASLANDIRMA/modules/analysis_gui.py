@@ -38,6 +38,13 @@ except Exception:
     pass
 
 from tkinter import messagebox, filedialog
+
+# İkon helper
+try:
+    from shared.utils import apply_window_icon
+except Exception:
+    def apply_window_icon(*_a, **_k):
+        return
 import tkinter.ttk as ttk
 import logging
 from datetime import datetime
@@ -92,6 +99,7 @@ class AnalysisGUI:
             self.window = ctk.CTkToplevel(self.parent)
             self.window.title("ARAÇ Analiz Modülü")
             self.window.geometry("1400x800")
+            apply_window_icon(self.window, prefer_chicken=True)
             
             # Pencereyi modal yap
             self.window.transient(self.parent)

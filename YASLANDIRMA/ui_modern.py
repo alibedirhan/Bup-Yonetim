@@ -67,6 +67,13 @@ for p in [_current_dir, _gui_dir, _modules_dir]:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("YASLANDIRMA_UI")
 
+# İkon helper (shared varsa kullan)
+try:
+    from shared.utils import apply_window_icon
+except Exception:
+    def apply_window_icon(*_a, **_k):
+        return
+
 # =============================================================================
 # RENKLER
 # =============================================================================
@@ -102,6 +109,9 @@ class PreviewWindow(ctk.CTkToplevel):
     
     def __init__(self, parent, dataframe, title="Veri Önizlemesi"):
         super().__init__(parent)
+
+        # Title bar/taskbar ikonu
+        apply_window_icon(self, prefer_chicken=True)
         
         self.df = dataframe
         self.title(title)
@@ -1122,6 +1132,7 @@ Tarih: {datetime.now().strftime('%d.%m.%Y %H:%M')}
         win.title(title)
         win.geometry("600x500")
         win.transient(self.master)
+        apply_window_icon(win, prefer_chicken=True)
         
         # Header
         header = ctk.CTkFrame(win, fg_color=COLORS['accent'], height=50, corner_radius=0)
