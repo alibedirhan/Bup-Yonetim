@@ -2,6 +2,49 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.3.0] - 2024-12-24 🎨 MAJOR TEMA GÜNCELLEMESİ
+
+### ✨ YENİ: Profesyonel Tema Sistemi
+
+HTML prototipinden türetilen mükemmel tema sistemi!
+
+#### 🌞 Light Tema
+```
+bg_primary:     #f5f5f7   (açık gri arka plan)
+bg_secondary:   #ffffff   (beyaz)
+bg_card:        #ffffff   (kart arka planı)
+text_primary:   #1d1d1f   (koyu metin)
+text_secondary: #6e6e73   (ikincil metin)
+border:         #d2d2d7   (border)
+```
+
+#### 🌙 Dark Tema (Claude Tarzı)
+```
+bg_primary:     #1a1a2e   (koyu lacivert)
+bg_secondary:   #16213e   (daha koyu)
+bg_card:        #252542   (kart arka planı)
+text_primary:   #f5f5f7   (açık metin - OKUNABILIR!)
+text_secondary: #a1a1aa   (ikincil metin)
+border:         #3f3f5a   (border)
+```
+
+### 🎴 ModernModuleCard Yenilendi
+- `update_theme(is_dark)` metodu eklendi
+- Tüm metin renkleri dinamik güncelleniyor
+- İkon arka planları tema uyumlu
+- Hover efektleri tema uyumlu
+- Accent bar tasarımı (üst renkli çizgi)
+
+### 🦶 Footer Yenilendi
+- Tüm label'lara referans eklendi
+- Border ve hover renkleri tema uyumlu
+- Butonlar HTML prototipindeki gibi
+
+### 📝 Teknik Detaylar
+- `LIGHT_COLORS` ve `DARK_COLORS` sözlükleri
+- `module_cards` listesi ile tüm kartlara erişim
+- `_update_main_ui_colors()` tüm bileşenleri günceller
+
 ## [3.2.9] - 2024-12-24
 
 ### 🎨 Dark Tema - Claude Tarzı Yeniden Tasarım

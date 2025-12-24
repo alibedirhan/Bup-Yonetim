@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.2.9"
+APP_VERSION = "3.3.0"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -60,40 +60,44 @@ def check_for_updates():
 
 
 # =============================================================================
-# RENK PALETİ - MODERN TASARIM
+# RENK PALETİ - MODERN TASARIM (HTML Prototipinden)
 # =============================================================================
 
-# Light tema renkleri
+# Light tema renkleri - Profesyonel ve temiz
 LIGHT_COLORS = {
-    'bg_primary': '#F8FAFC',
-    'bg_secondary': '#FFFFFF',
-    'bg_header': '#1E3A5F',
-    'bg_card': '#FFFFFF',
-    'text_primary': '#1E293B',
-    'text_secondary': '#64748B',
-    'text_muted': '#94A3B8',
-    'border': '#E2E8F0',
-    'hover': '#F1F5F9',
+    'bg_primary': '#f5f5f7',       # Ana arka plan - açık gri
+    'bg_secondary': '#ffffff',      # İkincil arka plan - beyaz
+    'bg_header': '#1E3A5F',         # Header - koyu mavi
+    'bg_card': '#ffffff',           # Kart arka planı
+    'bg_card_hover': '#f8f9fa',     # Kart hover
+    'text_primary': '#1d1d1f',      # Ana metin - koyu
+    'text_secondary': '#6e6e73',    # İkincil metin
+    'text_muted': '#86868b',        # Soluk metin
+    'border': '#d2d2d7',            # Border
+    'border_light': '#e8e8ed',      # Açık border
+    'hover': '#f8f9fa',             # Hover
 }
 
 # Dark tema renkleri - Claude tarzı (koyu lacivert/mor tonları)
 DARK_COLORS = {
-    'bg_primary': '#1a1a2e',      # Ana arka plan - koyu lacivert
-    'bg_secondary': '#16213e',     # İkincil arka plan
-    'bg_header': '#0f0f1a',        # Header - en koyu
-    'bg_card': '#252540',          # Kart arka planı
-    'text_primary': '#E8E8F0',     # Ana metin - açık gri
-    'text_secondary': '#A0A0B8',   # İkincil metin
-    'text_muted': '#6B6B80',       # Soluk metin
-    'border': '#3d3d5c',           # Border
-    'hover': '#2d2d44',            # Hover
+    'bg_primary': '#1a1a2e',        # Ana arka plan - koyu lacivert
+    'bg_secondary': '#16213e',      # İkincil arka plan
+    'bg_header': '#0f0f23',         # Header - en koyu
+    'bg_card': '#252542',           # Kart arka planı
+    'bg_card_hover': '#2d2d4a',     # Kart hover
+    'text_primary': '#f5f5f7',      # Ana metin - açık (OKUNABILIR!)
+    'text_secondary': '#a1a1aa',    # İkincil metin
+    'text_muted': '#71717a',        # Soluk metin
+    'border': '#3f3f5a',            # Border
+    'border_light': '#2a2a42',      # Açık border
+    'hover': '#2d2d4a',             # Hover
 }
 
 # Aktif renk paleti (varsayılan light)
 MODERN_COLORS = {
     # Ana renkler
-    'bg_primary': '#F8FAFC',
-    'bg_secondary': '#FFFFFF',
+    'bg_primary': '#f5f5f7',
+    'bg_secondary': '#ffffff',
     'bg_header': '#1E3A5F',
     'bg_header_gradient': '#0F2439',
     
@@ -104,24 +108,25 @@ MODERN_COLORS = {
     'accent_orange': '#F97316',
     
     # Metin
-    'text_primary': '#1E293B',
-    'text_secondary': '#64748B',
-    'text_muted': '#94A3B8',
+    'text_primary': '#1d1d1f',
+    'text_secondary': '#6e6e73',
+    'text_muted': '#86868b',
     'text_white': '#FFFFFF',
     
     # Diğer
-    'border': '#E2E8F0',
+    'border': '#d2d2d7',
+    'border_light': '#e8e8ed',
     'shadow': '#00000015',
-    'hover': '#F1F5F9',
+    'hover': '#f8f9fa',
 }
 
 
 # =============================================================================
-# MODERN MODÜL KARTI
+# MODERN MODÜL KARTI - Tema Destekli
 # =============================================================================
 
 class ModernModuleCard(ctk.CTkFrame):
-    """Modern tasarımlı modül kartı"""
+    """Modern tasarımlı modül kartı - Light/Dark tema destekli"""
     
     def __init__(self, master, title: str, description: str, icon: str, 
                  accent_color: str, features: list, command, **kwargs):
@@ -135,104 +140,128 @@ class ModernModuleCard(ctk.CTkFrame):
             fg_color=MODERN_COLORS['bg_secondary'],
             corner_radius=16,
             border_width=1,
-            border_color=MODERN_COLORS['border'],
+            border_color=MODERN_COLORS.get('border_light', MODERN_COLORS['border']),
             **kwargs
         )
         
         self.accent_color = accent_color
         self.command = command
+        self.title_text = title
+        self.description_text = description
+        self.features_list = features
+        
+        # UI elemanları referansları
+        self.title_label = None
+        self.desc_label = None
+        self.feature_labels = []
+        self.icon_frame = None
+        
         self._setup_ui(title, description, icon, features)
         self._setup_hover()
     
     def _setup_ui(self, title: str, description: str, icon: str, features: list):
         """UI bileşenlerini oluştur"""
         # Ana container
-        container = ctk.CTkFrame(self, fg_color="transparent")
-        container.pack(fill="both", expand=True, padx=20, pady=20)
+        self.container = ctk.CTkFrame(self, fg_color="transparent")
+        self.container.pack(fill="both", expand=True, padx=0, pady=0)
         
-        # Üst renkli çizgi
-        accent_bar = ctk.CTkFrame(
-            container, 
+        # Üst renkli çizgi (accent bar)
+        self.accent_bar = ctk.CTkFrame(
+            self.container, 
             fg_color=self.accent_color, 
-            height=5, 
-            corner_radius=3
+            height=4, 
+            corner_radius=0
         )
-        accent_bar.pack(fill="x", pady=(0, 20))
+        self.accent_bar.pack(fill="x")
+        
+        # İçerik alanı
+        content = ctk.CTkFrame(self.container, fg_color="transparent")
+        content.pack(fill="both", expand=True, padx=24, pady=24)
         
         # İkon alanı
-        icon_frame = ctk.CTkFrame(
-            container,
-            fg_color=self._lighten_color(self.accent_color, 0.9),
+        self.icon_frame = ctk.CTkFrame(
+            content,
+            fg_color=self._get_icon_bg_color(),
             corner_radius=16,
-            width=80,
-            height=80
+            width=70,
+            height=70
         )
-        icon_frame.pack(pady=(0, 20))
-        icon_frame.pack_propagate(False)
+        self.icon_frame.pack(pady=(0, 18))
+        self.icon_frame.pack_propagate(False)
         
-        # İkon - modüle özel
-        icons_map = {'💰': '₺', '📊': '📈', '👥': '👤', '📈': '⏰'}
-        display_icon = icons_map.get(icon, icon)
-        
-        ctk.CTkLabel(
-            icon_frame,
-            text=display_icon,
-            font=ctk.CTkFont(size=32),
+        # İkon
+        self.icon_label = ctk.CTkLabel(
+            self.icon_frame,
+            text=icon,
+            font=ctk.CTkFont(size=28),
             text_color=self.accent_color
-        ).place(relx=0.5, rely=0.5, anchor="center")
+        )
+        self.icon_label.place(relx=0.5, rely=0.5, anchor="center")
         
         # Başlık
-        ctk.CTkLabel(
-            container,
+        self.title_label = ctk.CTkLabel(
+            content,
             text=title,
             font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
             text_color=MODERN_COLORS['text_primary']
-        ).pack(pady=(0, 8))
+        )
+        self.title_label.pack(pady=(0, 8))
         
         # Açıklama
-        ctk.CTkLabel(
-            container,
+        self.desc_label = ctk.CTkLabel(
+            content,
             text=description,
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            font=ctk.CTkFont(family="Segoe UI", size=13),
             text_color=MODERN_COLORS['text_secondary'],
-            wraplength=200
-        ).pack(pady=(0, 20))
+            wraplength=220
+        )
+        self.desc_label.pack(pady=(0, 20))
         
         # Özellikler listesi
-        features_frame = ctk.CTkFrame(container, fg_color="transparent")
-        features_frame.pack(fill="x", pady=(0, 20))
+        features_frame = ctk.CTkFrame(content, fg_color="transparent")
+        features_frame.pack(fill="x", pady=(0, 24))
         
+        self.feature_labels = []
         for feature in features:
             feature_row = ctk.CTkFrame(features_frame, fg_color="transparent")
-            feature_row.pack(fill="x", pady=3)
+            feature_row.pack(fill="x", pady=6)
             
-            ctk.CTkLabel(
+            check_label = ctk.CTkLabel(
                 feature_row,
                 text="✓",
-                font=ctk.CTkFont(size=12),
+                font=ctk.CTkFont(size=12, weight="bold"),
                 text_color=self.accent_color,
                 width=20
-            ).pack(side="left")
+            )
+            check_label.pack(side="left")
             
-            ctk.CTkLabel(
+            text_label = ctk.CTkLabel(
                 feature_row,
                 text=feature,
-                font=ctk.CTkFont(family="Segoe UI", size=11),
+                font=ctk.CTkFont(family="Segoe UI", size=13),
                 text_color=MODERN_COLORS['text_secondary']
-            ).pack(side="left")
+            )
+            text_label.pack(side="left")
+            
+            self.feature_labels.append(text_label)
         
         # Başlat butonu
         self.start_btn = ctk.CTkButton(
-            container,
+            content,
             text="Başlat",
-            font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
             fg_color=self.accent_color,
             hover_color=self._darken_color(self.accent_color, 0.15),
-            corner_radius=25,
-            height=45,
+            corner_radius=12,
+            height=48,
             command=self.command
         )
         self.start_btn.pack(fill="x")
+    
+    def _get_icon_bg_color(self):
+        """İkon arka plan rengini hesapla"""
+        # Accent rengin %10 opaklığında arka plan
+        return self._lighten_color(self.accent_color, 0.9)
     
     def _setup_hover(self):
         """Hover efektleri"""
@@ -240,24 +269,57 @@ class ModernModuleCard(ctk.CTkFrame):
             self.configure(border_color=self.accent_color, border_width=2)
         
         def on_leave(e):
-            self.configure(border_color=MODERN_COLORS['border'], border_width=1)
+            self.configure(
+                border_color=MODERN_COLORS.get('border_light', MODERN_COLORS['border']), 
+                border_width=1
+            )
         
         self.bind("<Enter>", on_enter)
         self.bind("<Leave>", on_leave)
     
+    def update_theme(self, is_dark: bool):
+        """Tema değişikliğinde kartı güncelle"""
+        colors = DARK_COLORS if is_dark else LIGHT_COLORS
+        
+        # Kart arka planı
+        self.configure(
+            fg_color=colors['bg_card'],
+            border_color=colors.get('border_light', colors['border'])
+        )
+        
+        # Başlık
+        if self.title_label:
+            self.title_label.configure(text_color=colors['text_primary'])
+        
+        # Açıklama
+        if self.desc_label:
+            self.desc_label.configure(text_color=colors['text_secondary'])
+        
+        # Özellik metinleri
+        for label in self.feature_labels:
+            label.configure(text_color=colors['text_secondary'])
+        
+        # İkon arka planı - dark modda biraz daha belirgin
+        if self.icon_frame:
+            if is_dark:
+                # Dark modda icon background biraz daha görünür
+                self.icon_frame.configure(fg_color=self._lighten_color(self.accent_color, 0.85))
+            else:
+                self.icon_frame.configure(fg_color=self._lighten_color(self.accent_color, 0.9))
+    
     def _lighten_color(self, hex_color: str, factor: float) -> str:
         """Rengi açıklaştır"""
         hex_color = hex_color.lstrip('#')
-        r, g, b = int(hex_color[:2], 16), int(hex_color[2:4], 16), int(hex_color[4:], 16)
-        r = min(255, int(r + (255 - r) * factor))
-        g = min(255, int(g + (255 - g) * factor))
-        b = min(255, int(b + (255 - b) * factor))
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        r = int(r + (255 - r) * factor)
+        g = int(g + (255 - g) * factor)
+        b = int(b + (255 - b) * factor)
         return f'#{r:02x}{g:02x}{b:02x}'
     
     def _darken_color(self, hex_color: str, factor: float) -> str:
         """Rengi koyulaştır"""
         hex_color = hex_color.lstrip('#')
-        r, g, b = int(hex_color[:2], 16), int(hex_color[2:4], 16), int(hex_color[4:], 16)
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
         r = int(r * (1 - factor))
         g = int(g * (1 - factor))
         b = int(b * (1 - factor))
@@ -530,6 +592,8 @@ class BupilicMainApp(ctk.CTk):
             }
         ]
         
+        # Kartları oluştur ve listede sakla
+        self.module_cards = []
         for i, module in enumerate(modules):
             card = ModernModuleCard(
                 cards_container,
@@ -541,6 +605,7 @@ class BupilicMainApp(ctk.CTk):
                 command=module['command']
             )
             card.grid(row=0, column=i, padx=10, pady=10, sticky="nsew")
+            self.module_cards.append(card)
     
     def _create_footer(self):
         """Footer - Tema ve ayarlar"""
@@ -568,24 +633,26 @@ class BupilicMainApp(ctk.CTk):
         self.footer_text = ctk.CTkLabel(
             info,
             text=f"🐔 Bupiliç v{APP_VERSION} Modern Edition",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            font=ctk.CTkFont(family="Segoe UI", size=13),
             text_color=MODERN_COLORS['text_secondary']
         )
         self.footer_text.pack(side="left")
         
-        ctk.CTkLabel(
+        self.footer_separator = ctk.CTkLabel(
             info,
             text="  •  ",
             font=ctk.CTkFont(size=12),
             text_color=MODERN_COLORS['text_muted']
-        ).pack(side="left")
+        )
+        self.footer_separator.pack(side="left")
         
-        ctk.CTkLabel(
+        self.footer_author = ctk.CTkLabel(
             info,
             text="Ali Bedirhan",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            font=ctk.CTkFont(family="Segoe UI", size=13),
             text_color=MODERN_COLORS['text_secondary']
-        ).pack(side="left")
+        )
+        self.footer_author.pack(side="left")
         
         # Sağ - Butonlar
         right = ctk.CTkFrame(footer, fg_color="transparent")
@@ -598,28 +665,32 @@ class BupilicMainApp(ctk.CTk):
         self.theme_btn = ctk.CTkButton(
             btn_frame,
             text="🐔",  # Tavuk ikonu - Gündüz
-            width=45,
-            height=45,
-            corner_radius=22,
+            width=48,
+            height=48,
+            corner_radius=24,
             fg_color=MODERN_COLORS['hover'],
             hover_color=MODERN_COLORS['border'],
             text_color=MODERN_COLORS['text_secondary'],
+            border_width=1,
+            border_color=MODERN_COLORS['border'],
             font=ctk.CTkFont(size=20),
             command=self._toggle_theme_with_animation
         )
-        self.theme_btn.pack(side="left", padx=(0, 10))
+        self.theme_btn.pack(side="left", padx=(0, 12))
         
         # Ayarlar butonu
         self.settings_btn = ctk.CTkButton(
             btn_frame,
             text="⚙️ Ayarlar",
             width=110,
-            height=40,
-            corner_radius=20,
+            height=48,
+            corner_radius=24,
             fg_color=MODERN_COLORS['hover'],
             hover_color=MODERN_COLORS['border'],
             text_color=MODERN_COLORS['text_secondary'],
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            border_width=1,
+            border_color=MODERN_COLORS['border'],
+            font=ctk.CTkFont(family="Segoe UI", size=13),
             command=self._open_settings_safe
         )
         self.settings_btn.pack(side="left")
@@ -672,85 +743,65 @@ class BupilicMainApp(ctk.CTk):
         """Ana ekran renklerini güncelle - Claude tarzı dark tema"""
         if self.is_dark_mode:
             colors = DARK_COLORS
-            # Ana pencere
-            self.configure(fg_color=colors['bg_primary'])
-            
-            # Header güncelle
-            if hasattr(self, 'header_frame'):
-                self.header_frame.configure(fg_color=colors['bg_header'])
-            
-            # Hoşgeldin bölümü
-            if hasattr(self, 'welcome_frame'):
-                self.welcome_frame.configure(fg_color=colors['bg_primary'])
-            if hasattr(self, 'welcome_title'):
-                self.welcome_title.configure(text_color="#7C8DB0")
-            if hasattr(self, 'welcome_subtitle'):
-                self.welcome_subtitle.configure(text_color=colors['text_secondary'])
-            
-            # Kartları güncelle
-            if hasattr(self, 'cards_frame'):
-                self.cards_frame.configure(fg_color=colors['bg_primary'])
-            
-            # Footer güncelle
-            if hasattr(self, 'footer_frame'):
-                self.footer_frame.configure(fg_color=colors['bg_secondary'])
-            if hasattr(self, 'footer_text'):
-                self.footer_text.configure(text_color=colors['text_secondary'])
-            
-            # Tema ve Ayarlar butonları
-            if hasattr(self, 'theme_btn'):
-                self.theme_btn.configure(
-                    fg_color=colors['hover'],
-                    hover_color=colors['border'],
-                    text_color=colors['text_primary']
-                )
-            if hasattr(self, 'settings_btn'):
-                self.settings_btn.configure(
-                    fg_color=colors['hover'],
-                    hover_color=colors['border'],
-                    text_color=colors['text_primary']
-                )
-                
         else:
             colors = LIGHT_COLORS
-            # Ana pencere
-            self.configure(fg_color=colors['bg_primary'])
-            
-            # Header güncelle
-            if hasattr(self, 'header_frame'):
-                self.header_frame.configure(fg_color=MODERN_COLORS['bg_header'])
-            
-            # Hoşgeldin bölümü
-            if hasattr(self, 'welcome_frame'):
-                self.welcome_frame.configure(fg_color=colors['bg_primary'])
-            if hasattr(self, 'welcome_title'):
-                self.welcome_title.configure(text_color="#F97316")
-            if hasattr(self, 'welcome_subtitle'):
-                self.welcome_subtitle.configure(text_color=colors['text_secondary'])
-            
-            # Kartları güncelle
-            if hasattr(self, 'cards_frame'):
-                self.cards_frame.configure(fg_color=colors['bg_primary'])
-            
-            # Footer güncelle
-            if hasattr(self, 'footer_frame'):
-                self.footer_frame.configure(fg_color=colors['bg_secondary'])
-            if hasattr(self, 'footer_text'):
-                self.footer_text.configure(text_color=colors['text_secondary'])
-            
-            # Tema ve Ayarlar butonları
-            if hasattr(self, 'theme_btn'):
-                self.theme_btn.configure(
-                    fg_color=MODERN_COLORS['hover'],
-                    hover_color=MODERN_COLORS['border'],
-                    text_color=MODERN_COLORS['text_secondary']
-                )
-            if hasattr(self, 'settings_btn'):
-                self.settings_btn.configure(
-                    fg_color=MODERN_COLORS['hover'],
-                    hover_color=MODERN_COLORS['border'],
-                    text_color=MODERN_COLORS['text_secondary']
-                )
+        
+        # Ana pencere
+        self.configure(fg_color=colors['bg_primary'])
+        
+        # Header güncelle
+        if hasattr(self, 'header_frame'):
+            self.header_frame.configure(fg_color=colors['bg_header'])
+        
+        # Hoşgeldin bölümü
+        if hasattr(self, 'welcome_frame'):
+            self.welcome_frame.configure(fg_color="transparent")
+        if hasattr(self, 'welcome_title'):
+            # Dark modda turuncu daha parlak, light modda normal
+            title_color = "#f59e0b" if self.is_dark_mode else "#F97316"
+            self.welcome_title.configure(text_color=title_color)
+        if hasattr(self, 'welcome_subtitle'):
+            self.welcome_subtitle.configure(text_color=colors['text_secondary'])
+        
+        # Kartlar container
+        if hasattr(self, 'cards_frame'):
+            self.cards_frame.configure(fg_color="transparent")
+        
+        # Modül kartlarını güncelle
+        if hasattr(self, 'module_cards'):
+            for card in self.module_cards:
+                card.update_theme(self.is_dark_mode)
+        
+        # Footer güncelle
+        if hasattr(self, 'footer_frame'):
+            self.footer_frame.configure(
+                fg_color=colors['bg_secondary'],
+                border_color=colors.get('border_light', colors['border'])
+            )
+        if hasattr(self, 'footer_text'):
+            self.footer_text.configure(text_color=colors['text_secondary'])
+        if hasattr(self, 'footer_separator'):
+            self.footer_separator.configure(text_color=colors['text_muted'])
+        if hasattr(self, 'footer_author'):
+            self.footer_author.configure(text_color=colors['text_secondary'])
+        
+        # Tema ve Ayarlar butonları
+        if hasattr(self, 'theme_btn'):
+            self.theme_btn.configure(
+                fg_color=colors['bg_card'] if self.is_dark_mode else colors['hover'],
+                hover_color=colors['hover'] if self.is_dark_mode else colors['border'],
+                text_color=colors['text_primary'],
+                border_color=colors['border'],
+                border_width=1
+            )
+        if hasattr(self, 'settings_btn'):
+            self.settings_btn.configure(
+                fg_color=colors['bg_card'] if self.is_dark_mode else colors['hover'],
+                hover_color=colors['hover'] if self.is_dark_mode else colors['border'],
+                text_color=colors['text_secondary'],
+                border_color=colors['border'],
+                border_width=1
+            )
     
     def _apply_theme_direct(self, theme: str):
         """Tema uygula - Ayarlar penceresinden (sadece ana ekran)"""
@@ -819,6 +870,12 @@ class BupilicMainApp(ctk.CTk):
         settings.lift()
         
         # === UI İÇERİĞİ ===
+        # Tema renklerini al
+        colors = DARK_COLORS if self.is_dark_mode else LIGHT_COLORS
+        
+        # Ana pencere arka planı
+        settings.configure(fg_color=colors['bg_primary'])
+        
         main = ctk.CTkFrame(settings, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=25, pady=25)
         
@@ -826,18 +883,25 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             main,
             text="⚙️ Uygulama Ayarları",
-            font=ctk.CTkFont(family="Segoe UI", size=22, weight="bold")
+            font=ctk.CTkFont(family="Segoe UI", size=22, weight="bold"),
+            text_color=colors['text_primary']
         ).pack(anchor="w")
         
         ctk.CTkLabel(
             main,
             text="Uygulamanın görünümünü ve davranışını özelleştirin",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
-            text_color="#64748B"
+            font=ctk.CTkFont(family="Segoe UI", size=13),
+            text_color=colors['text_secondary']
         ).pack(anchor="w", pady=(5, 25))
         
         # === GÖRÜNÜM KARTI ===
-        appearance_card = ctk.CTkFrame(main, corner_radius=12)
+        appearance_card = ctk.CTkFrame(
+            main, 
+            corner_radius=12,
+            fg_color=colors['bg_card'],
+            border_width=1,
+            border_color=colors['border_light']
+        )
         appearance_card.pack(fill="x", pady=(0, 15))
         
         app_inner = ctk.CTkFrame(appearance_card, fg_color="transparent")
@@ -846,7 +910,8 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             app_inner,
             text="🎨 Görünüm",
-            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold")
+            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
+            text_color=colors['text_primary']
         ).pack(anchor="w", pady=(0, 15))
         
         # Tema satırı
@@ -856,7 +921,8 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             theme_row,
             text="Tema:",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            font=ctk.CTkFont(family="Segoe UI", size=13),
+            text_color=colors['text_secondary'],
             width=120, anchor="w"
         ).pack(side="left")
         
@@ -865,15 +931,22 @@ class BupilicMainApp(ctk.CTk):
         
         theme_selector = ctk.CTkSegmentedButton(
             theme_row,
-            values=["Light", "Dark", "System"],
+            values=["Light", "Dark"],
             command=self._apply_theme_direct,
-            font=ctk.CTkFont(size=11)
+            font=ctk.CTkFont(size=12),
+            corner_radius=8
         )
         theme_selector.set(current_theme)
         theme_selector.pack(side="right")
         
         # === PROGRAM KARTI ===
-        program_card = ctk.CTkFrame(main, corner_radius=12)
+        program_card = ctk.CTkFrame(
+            main, 
+            corner_radius=12,
+            fg_color=colors['bg_card'],
+            border_width=1,
+            border_color=colors['border_light']
+        )
         program_card.pack(fill="x", pady=(0, 15))
         
         prog_inner = ctk.CTkFrame(program_card, fg_color="transparent")
@@ -882,7 +955,8 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             prog_inner,
             text="🖥️ Program",
-            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold")
+            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
+            text_color=colors['text_primary']
         ).pack(anchor="w", pady=(0, 15))
         
         # Versiyon bilgisi
@@ -892,19 +966,26 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             version_row,
             text="Versiyon:",
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            font=ctk.CTkFont(family="Segoe UI", size=13),
+            text_color=colors['text_secondary'],
             width=120, anchor="w"
         ).pack(side="left")
         
         ctk.CTkLabel(
             version_row,
             text=f"v{APP_VERSION}",
-            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
             text_color="#3B82F6"
         ).pack(side="right")
         
         # === HAKKINDA KARTI ===
-        about_card = ctk.CTkFrame(main, corner_radius=12)
+        about_card = ctk.CTkFrame(
+            main, 
+            corner_radius=12,
+            fg_color=colors['bg_card'],
+            border_width=1,
+            border_color=colors['border_light']
+        )
         about_card.pack(fill="x", pady=(0, 15))
         
         about_inner = ctk.CTkFrame(about_card, fg_color="transparent")
@@ -913,7 +994,8 @@ class BupilicMainApp(ctk.CTk):
         ctk.CTkLabel(
             about_inner,
             text="ℹ️ Hakkında",
-            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold")
+            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
+            text_color=colors['text_primary']
         ).pack(anchor="w", pady=(0, 15))
         
         ctk.CTkLabel(
@@ -922,8 +1004,8 @@ class BupilicMainApp(ctk.CTk):
                  f"Versiyon: {APP_VERSION}\n"
                  f"Geliştirici: Ali Bedirhan\n"
                  f"© 2024-2025",
-            font=ctk.CTkFont(family="Segoe UI", size=11),
-            text_color="#64748B",
+            font=ctk.CTkFont(family="Segoe UI", size=12),
+            text_color=colors['text_secondary'],
             justify="left"
         ).pack(anchor="w")
         
@@ -932,8 +1014,13 @@ class BupilicMainApp(ctk.CTk):
             main,
             text="Kapat",
             width=120,
-            height=40,
-            corner_radius=20,
+            height=44,
+            corner_radius=22,
+            fg_color=colors['bg_card'] if self.is_dark_mode else colors['hover'],
+            hover_color=colors['hover'] if self.is_dark_mode else colors['border'],
+            text_color=colors['text_primary'],
+            border_width=1,
+            border_color=colors['border'],
             command=close_settings
         ).pack(side="bottom", pady=(20, 0))
     
