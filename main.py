@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.2.8"
+APP_VERSION = "3.2.9"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -63,6 +63,33 @@ def check_for_updates():
 # RENK PALETİ - MODERN TASARIM
 # =============================================================================
 
+# Light tema renkleri
+LIGHT_COLORS = {
+    'bg_primary': '#F8FAFC',
+    'bg_secondary': '#FFFFFF',
+    'bg_header': '#1E3A5F',
+    'bg_card': '#FFFFFF',
+    'text_primary': '#1E293B',
+    'text_secondary': '#64748B',
+    'text_muted': '#94A3B8',
+    'border': '#E2E8F0',
+    'hover': '#F1F5F9',
+}
+
+# Dark tema renkleri - Claude tarzı (koyu lacivert/mor tonları)
+DARK_COLORS = {
+    'bg_primary': '#1a1a2e',      # Ana arka plan - koyu lacivert
+    'bg_secondary': '#16213e',     # İkincil arka plan
+    'bg_header': '#0f0f1a',        # Header - en koyu
+    'bg_card': '#252540',          # Kart arka planı
+    'text_primary': '#E8E8F0',     # Ana metin - açık gri
+    'text_secondary': '#A0A0B8',   # İkincil metin
+    'text_muted': '#6B6B80',       # Soluk metin
+    'border': '#3d3d5c',           # Border
+    'hover': '#2d2d44',            # Hover
+}
+
+# Aktif renk paleti (varsayılan light)
 MODERN_COLORS = {
     # Ana renkler
     'bg_primary': '#F8FAFC',
@@ -352,14 +379,17 @@ class BupilicMainApp(ctk.CTk):
     
     def _create_header(self):
         """Modern header - gradient ve logo ile"""
-        header = ctk.CTkFrame(
+        self.header_frame = ctk.CTkFrame(
             self,
             fg_color=MODERN_COLORS['bg_header'],
             corner_radius=0,
             height=120
         )
-        header.grid(row=0, column=0, sticky="ew")
-        header.grid_propagate(False)
+        self.header_frame.grid(row=0, column=0, sticky="ew")
+        self.header_frame.grid_propagate(False)
+        
+        # Header için kısa referans
+        header = self.header_frame
         
         # Header içeriği
         content = ctk.CTkFrame(header, fg_color="transparent")
@@ -434,26 +464,31 @@ class BupilicMainApp(ctk.CTk):
         content.grid(row=1, column=0, sticky="nsew", padx=50, pady=30)
         
         # Hoşgeldin bölümü
-        welcome = ctk.CTkFrame(content, fg_color="transparent")
-        welcome.pack(fill="x", pady=(0, 30))
+        self.welcome_frame = ctk.CTkFrame(content, fg_color="transparent")
+        self.welcome_frame.pack(fill="x", pady=(0, 30))
         
-        ctk.CTkLabel(
-            welcome,
+        self.welcome_title = ctk.CTkLabel(
+            self.welcome_frame,
             text="👋 Hoş Geldiniz!",
             font=ctk.CTkFont(family="Segoe UI", size=26, weight="bold"),
             text_color=MODERN_COLORS['text_primary']
-        ).pack(anchor="w")
+        )
+        self.welcome_title.pack(anchor="w")
         
-        ctk.CTkLabel(
-            welcome,
+        self.welcome_subtitle = ctk.CTkLabel(
+            self.welcome_frame,
             text="İşletme yönetimi için aşağıdaki modüllerden birini seçerek başlayabilirsiniz.",
             font=ctk.CTkFont(family="Segoe UI", size=13),
             text_color=MODERN_COLORS['text_secondary']
-        ).pack(anchor="w", pady=(8, 0))
+        )
+        self.welcome_subtitle.pack(anchor="w", pady=(8, 0))
         
         # Modül kartları container
-        cards_container = ctk.CTkFrame(content, fg_color="transparent")
-        cards_container.pack(fill="both", expand=True)
+        self.cards_frame = ctk.CTkFrame(content, fg_color="transparent")
+        self.cards_frame.pack(fill="both", expand=True)
+        
+        # Kısa referans
+        cards_container = self.cards_frame
         
         # 4 sütun grid
         for i in range(4):
@@ -509,7 +544,7 @@ class BupilicMainApp(ctk.CTk):
     
     def _create_footer(self):
         """Footer - Tema ve ayarlar"""
-        footer = ctk.CTkFrame(
+        self.footer_frame = ctk.CTkFrame(
             self,
             fg_color=MODERN_COLORS['bg_secondary'],
             corner_radius=0,
@@ -517,8 +552,11 @@ class BupilicMainApp(ctk.CTk):
             border_width=1,
             border_color=MODERN_COLORS['border']
         )
-        footer.grid(row=2, column=0, sticky="ew")
-        footer.grid_propagate(False)
+        self.footer_frame.grid(row=2, column=0, sticky="ew")
+        self.footer_frame.grid_propagate(False)
+        
+        # Kısa referans
+        footer = self.footer_frame
         
         # Sol - Bilgi
         left = ctk.CTkFrame(footer, fg_color="transparent")
@@ -527,12 +565,13 @@ class BupilicMainApp(ctk.CTk):
         info = ctk.CTkFrame(left, fg_color="transparent")
         info.pack(expand=True)
         
-        ctk.CTkLabel(
+        self.footer_text = ctk.CTkLabel(
             info,
-            text="🐔 Bupiliç v3.1 Modern Edition",
+            text=f"🐔 Bupiliç v{APP_VERSION} Modern Edition",
             font=ctk.CTkFont(family="Segoe UI", size=12),
             text_color=MODERN_COLORS['text_secondary']
-        ).pack(side="left")
+        )
+        self.footer_text.pack(side="left")
         
         ctk.CTkLabel(
             info,
@@ -571,7 +610,7 @@ class BupilicMainApp(ctk.CTk):
         self.theme_btn.pack(side="left", padx=(0, 10))
         
         # Ayarlar butonu
-        ctk.CTkButton(
+        self.settings_btn = ctk.CTkButton(
             btn_frame,
             text="⚙️ Ayarlar",
             width=110,
@@ -582,10 +621,11 @@ class BupilicMainApp(ctk.CTk):
             text_color=MODERN_COLORS['text_secondary'],
             font=ctk.CTkFont(family="Segoe UI", size=12),
             command=self._open_settings_safe
-        ).pack(side="left")
+        )
+        self.settings_btn.pack(side="left")
     
     # =========================================================================
-    # TEMA DEĞİŞTİRME - PROFESYONEl ÇÖZÜM
+    # TEMA DEĞİŞTİRME - SADECE ANA EKRAN (Modüller etkilenmiyor)
     # =========================================================================
     
     def _toggle_theme_with_animation(self):
@@ -606,31 +646,21 @@ class BupilicMainApp(ctk.CTk):
                 self.theme_btn.configure(text=frames[step])
                 self.after(60, lambda: self._run_chicken_animation(step + 1))
             except:
-                self._finish_theme_change()
+                self._apply_main_theme()
         else:
-            self._finish_theme_change()
+            self._apply_main_theme()
     
-    def _finish_theme_change(self):
-        """Animasyon bitince tema değiştir"""
+    def _apply_main_theme(self):
+        """Ana ekrana tema uygula - Modüller ETKİLENMİYOR"""
         try:
-            # Tema değiştir
             self.is_dark_mode = not self.is_dark_mode
-            new_mode = "dark" if self.is_dark_mode else "light"
-            
-            # CustomTkinter tema değiştir
-            ctk.set_appearance_mode(new_mode)
+            self._update_main_ui_colors()
             
             # İkon güncelle
             icon = "🌜" if self.is_dark_mode else "🐔"
             self.theme_btn.configure(text=icon, state="normal")
             
-            # Ana pencere rengini güncelle
-            if self.is_dark_mode:
-                self.configure(fg_color="#1a1a2e")
-            else:
-                self.configure(fg_color=MODERN_COLORS['bg_primary'])
-            
-            logger.info(f"Tema değiştirildi: {new_mode}")
+            logger.info(f"Ana ekran teması: {'dark' if self.is_dark_mode else 'light'}")
             
         except Exception as e:
             logger.error(f"Tema değiştirme hatası: {e}")
@@ -638,25 +668,99 @@ class BupilicMainApp(ctk.CTk):
             self.animating = False
             self.theme_btn.configure(state="normal")
     
-    def _apply_theme_direct(self, theme: str):
-        """Tema uygula - Ayarlar penceresinden"""
-        try:
-            mode = theme.lower()
-            if mode == "system":
-                mode = "system"
+    def _update_main_ui_colors(self):
+        """Ana ekran renklerini güncelle - Claude tarzı dark tema"""
+        if self.is_dark_mode:
+            colors = DARK_COLORS
+            # Ana pencere
+            self.configure(fg_color=colors['bg_primary'])
             
-            ctk.set_appearance_mode(mode)
+            # Header güncelle
+            if hasattr(self, 'header_frame'):
+                self.header_frame.configure(fg_color=colors['bg_header'])
+            
+            # Hoşgeldin bölümü
+            if hasattr(self, 'welcome_frame'):
+                self.welcome_frame.configure(fg_color=colors['bg_primary'])
+            if hasattr(self, 'welcome_title'):
+                self.welcome_title.configure(text_color="#7C8DB0")
+            if hasattr(self, 'welcome_subtitle'):
+                self.welcome_subtitle.configure(text_color=colors['text_secondary'])
+            
+            # Kartları güncelle
+            if hasattr(self, 'cards_frame'):
+                self.cards_frame.configure(fg_color=colors['bg_primary'])
+            
+            # Footer güncelle
+            if hasattr(self, 'footer_frame'):
+                self.footer_frame.configure(fg_color=colors['bg_secondary'])
+            if hasattr(self, 'footer_text'):
+                self.footer_text.configure(text_color=colors['text_secondary'])
+            
+            # Tema ve Ayarlar butonları
+            if hasattr(self, 'theme_btn'):
+                self.theme_btn.configure(
+                    fg_color=colors['hover'],
+                    hover_color=colors['border'],
+                    text_color=colors['text_primary']
+                )
+            if hasattr(self, 'settings_btn'):
+                self.settings_btn.configure(
+                    fg_color=colors['hover'],
+                    hover_color=colors['border'],
+                    text_color=colors['text_primary']
+                )
+                
+        else:
+            colors = LIGHT_COLORS
+            # Ana pencere
+            self.configure(fg_color=colors['bg_primary'])
+            
+            # Header güncelle
+            if hasattr(self, 'header_frame'):
+                self.header_frame.configure(fg_color=MODERN_COLORS['bg_header'])
+            
+            # Hoşgeldin bölümü
+            if hasattr(self, 'welcome_frame'):
+                self.welcome_frame.configure(fg_color=colors['bg_primary'])
+            if hasattr(self, 'welcome_title'):
+                self.welcome_title.configure(text_color="#F97316")
+            if hasattr(self, 'welcome_subtitle'):
+                self.welcome_subtitle.configure(text_color=colors['text_secondary'])
+            
+            # Kartları güncelle
+            if hasattr(self, 'cards_frame'):
+                self.cards_frame.configure(fg_color=colors['bg_primary'])
+            
+            # Footer güncelle
+            if hasattr(self, 'footer_frame'):
+                self.footer_frame.configure(fg_color=colors['bg_secondary'])
+            if hasattr(self, 'footer_text'):
+                self.footer_text.configure(text_color=colors['text_secondary'])
+            
+            # Tema ve Ayarlar butonları
+            if hasattr(self, 'theme_btn'):
+                self.theme_btn.configure(
+                    fg_color=MODERN_COLORS['hover'],
+                    hover_color=MODERN_COLORS['border'],
+                    text_color=MODERN_COLORS['text_secondary']
+                )
+            if hasattr(self, 'settings_btn'):
+                self.settings_btn.configure(
+                    fg_color=MODERN_COLORS['hover'],
+                    hover_color=MODERN_COLORS['border'],
+                    text_color=MODERN_COLORS['text_secondary']
+                )
+    
+    def _apply_theme_direct(self, theme: str):
+        """Tema uygula - Ayarlar penceresinden (sadece ana ekran)"""
+        try:
             self.is_dark_mode = (theme == "Dark")
+            self._update_main_ui_colors()
             
             # Ana buton ikonunu güncelle
             self.theme_btn.configure(text="🌜" if self.is_dark_mode else "🐔")
             
-            # Ana pencere rengini güncelle
-            if self.is_dark_mode:
-                self.configure(fg_color="#1a1a2e")
-            else:
-                self.configure(fg_color=MODERN_COLORS['bg_primary'])
-                
             logger.info(f"Tema uygulandı: {theme}")
             
         except Exception as e:

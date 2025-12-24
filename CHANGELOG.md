@@ -2,6 +2,41 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.9] - 2024-12-24
+
+### 🎨 Dark Tema - Claude Tarzı Yeniden Tasarım
+
+#### Yeni Renk Paleti (Claude Tarzı)
+```python
+DARK_COLORS = {
+    'bg_primary': '#1a1a2e',      # Ana arka plan - koyu lacivert
+    'bg_secondary': '#16213e',     # İkincil arka plan
+    'bg_header': '#0f0f1a',        # Header - en koyu
+    'bg_card': '#252540',          # Kart arka planı
+    'text_primary': '#E8E8F0',     # Ana metin - açık gri (okunabilir!)
+    'text_secondary': '#A0A0B8',   # İkincil metin
+    'border': '#3d3d5c',           # Border
+    'hover': '#2d2d44',            # Hover
+}
+```
+
+#### Modüller ETKİLENMİYOR ✅
+- `ctk.set_appearance_mode()` **KALDIRILDI** (tema değiştirmeden)
+- Sadece ana ekran renkleri manuel değiştiriliyor
+- Modüller açıldığında kendi temasını koruyor
+
+#### Güncellenen Bileşenler
+- Header arka planı
+- Welcome bölümü başlık/alt başlık
+- Footer arka planı ve metin
+- Tema/Ayarlar butonları
+- Ana pencere arka planı
+
+### 📝 Teknik Detaylar
+- UI bileşenlerine referanslar eklendi (`self.header_frame`, `self.welcome_title` vb.)
+- `_update_main_ui_colors()` fonksiyonu tüm ana ekran renklerini günceller
+- Dark/Light tema geçişi akıcı ve anlık
+
 ## [3.2.8] - 2024-12-24
 
 ### 🔧 KRİTİK DÜZELTMELER - Tema ve Ayarlar
