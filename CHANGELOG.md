@@ -2,6 +2,34 @@
 
 Bu proje [Semantic Versioning](https://semver.org/) kullanmaktadır.
 
+## [3.2.7] - 2024-12-24
+
+### 🎨 Ana Ekran Geliştirmeleri
+
+#### Program İkonu
+- Bupiliç logosu program ikonu olarak eklendi (`assets/bupilic.ico`)
+- Windows EXE dosyasında gösterilecek
+- Görev çubuğunda ve pencere başlığında görünecek
+
+#### Aydınlık/Karanlık Tema
+- **Tavuk animasyonu** eklendi! 🐔
+- Tema değiştirirken 8 frame'lik animasyon: 🐔→🐓→🥚→🐣→🐤→🐥→🐔→🐓
+- Gündüz modu: 🐔 (tavuk)
+- Gece modu: 🌜 (ay)
+
+#### Ayarlar Penceresi Donma Sorunu
+- `grab_release()` eklendi - kapanırken modal kilit düzgün kaldırılıyor
+- `WM_DELETE_WINDOW` protokolü eklendi
+- Kapat butonu `on_close` fonksiyonunu kullanıyor
+
+### 📦 PyInstaller Güncellemeleri
+- `--icon "assets/bupilic.ico"` eklendi
+- PIL.Image ve PIL.ImageTk hidden imports eklendi
+
+### 📁 Yeni Dosyalar
+- `assets/bupilic.ico` - Windows program ikonu (16x16 - 256x256)
+- `assets/bupilic.png` - PNG format ikon
+
 ## [3.2.6] - 2024-12-24
 
 ### 🔧 ISKONTO_HESABI UI Düzeltmeleri

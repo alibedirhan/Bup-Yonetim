@@ -75,6 +75,7 @@ jobs:
         # Build with command line (no spec file needed)
         pyinstaller --noconfirm --onefile --windowed `
           --name "BUP_Yonetim" `
+          --icon "assets/bupilic.ico" `
           --add-data "shared;shared" `
           --add-data "ISKONTO_HESABI;ISKONTO_HESABI" `
           --add-data "KARLILIK_ANALIZI;KARLILIK_ANALIZI" `
@@ -92,6 +93,9 @@ jobs:
           --hidden-import "tkinter.messagebox" `
           --hidden-import "tkinter.simpledialog" `
           --hidden-import "_tkinter" `
+          --hidden-import "PIL" `
+          --hidden-import "PIL.Image" `
+          --hidden-import "PIL.ImageTk" `
           --hidden-import "pandas" `
           --hidden-import "pandas._libs" `
           --hidden-import "pandas._libs.tslibs" `

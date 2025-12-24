@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.2.6"
+APP_VERSION = "3.2.7"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -251,8 +251,16 @@ class BupilicMainApp(ctk.CTk):
         self.geometry("1280x800")
         self.minsize(1100, 700)
         
+        # Program ikonu ayarla
+        self._set_app_icon()
+        
         # Tema
         self.is_dark_mode = False
+        
+        # Tavuk animasyonu için
+        self.chicken_frames = ["🐔", "🐓", "🐤", "🐣"]
+        self.chicken_frame_index = 0
+        self.animating = False
         
         # Modül pencereleri
         self.module_windows: Dict[str, ctk.CTkToplevel] = {}
@@ -268,6 +276,26 @@ class BupilicMainApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         logger.info("Ana uygulama başlatıldı")
+    
+    def _set_app_icon(self):
+        """Program ikonunu ayarla"""
+        try:
+            icon_path = BASE_DIR / "assets" / "bupilic.ico"
+            if icon_path.exists():
+                self.iconbitmap(str(icon_path))
+                logger.info("Program ikonu ayarlandı")
+            else:
+                # PNG ile dene (Linux/Mac için)
+                png_path = BASE_DIR / "assets" / "bupilic.png"
+                if png_path.exists():
+                    from PIL import Image, ImageTk
+                    img = Image.open(png_path)
+                    photo = ImageTk.PhotoImage(img)
+                    self.iconphoto(True, photo)
+                    self._icon_photo = photo  # Referansı tut
+                    logger.info("Program ikonu (PNG) ayarlandı")
+        except Exception as e:
+            logger.warning(f"İkon ayarlanamadı: {e}")
     
     def _setup_ui(self):
         """Tüm UI bileşenlerini oluştur"""
@@ -526,18 +554,18 @@ class BupilicMainApp(ctk.CTk):
         btn_frame = ctk.CTkFrame(right, fg_color="transparent")
         btn_frame.pack(expand=True)
         
-        # Tema butonu
+        # Tema butonu - Tavuk animasyonlu
         self.theme_btn = ctk.CTkButton(
             btn_frame,
-            text="🌙" if not self.is_dark_mode else "☀️",
-            width=40,
-            height=40,
-            corner_radius=20,
+            text="🐔",  # Tavuk ikonu
+            width=45,
+            height=45,
+            corner_radius=22,
             fg_color=MODERN_COLORS['hover'],
             hover_color=MODERN_COLORS['border'],
             text_color=MODERN_COLORS['text_secondary'],
-            font=ctk.CTkFont(size=16),
-            command=self._toggle_theme
+            font=ctk.CTkFont(size=20),
+            command=self._toggle_theme_animated
         )
         self.theme_btn.pack(side="left", padx=(0, 10))
         
@@ -559,16 +587,44 @@ class BupilicMainApp(ctk.CTk):
     # TEMA VE AYARLAR
     # =========================================================================
     
+    def _toggle_theme_animated(self):
+        """Tema değiştir - Tavuk animasyonlu"""
+        if self.animating:
+            return
+        
+        self.animating = True
+        self._animate_chicken(0)
+    
+    def _animate_chicken(self, step: int):
+        """Tavuk animasyonu"""
+        if step < 8:  # 8 frame animasyon
+            # Tavuk frame'leri arasında geçiş
+            frames = ["🐔", "🐓", "🥚", "🐣", "🐤", "🐥", "🐔", "🐓"]
+            self.theme_btn.configure(text=frames[step % len(frames)])
+            self.after(80, lambda: self._animate_chicken(step + 1))
+        else:
+            # Animasyon bitti, tema değiştir
+            self.is_dark_mode = not self.is_dark_mode
+            
+            if self.is_dark_mode:
+                ctk.set_appearance_mode("dark")
+                self.theme_btn.configure(text="🌜")  # Gece tavuğu
+            else:
+                ctk.set_appearance_mode("light")
+                self.theme_btn.configure(text="🐔")  # Gündüz tavuğu
+            
+            self.animating = False
+    
     def _toggle_theme(self):
-        """Tema değiştir"""
+        """Tema değiştir - Basit versiyon"""
         self.is_dark_mode = not self.is_dark_mode
         
         if self.is_dark_mode:
             ctk.set_appearance_mode("dark")
-            self.theme_btn.configure(text="☀️")
+            self.theme_btn.configure(text="🌜")
         else:
             ctk.set_appearance_mode("light")
-            self.theme_btn.configure(text="🌙")
+            self.theme_btn.configure(text="🐔")
     
     def _show_settings(self):
         """Gelişmiş ayarlar penceresi"""
@@ -576,6 +632,7 @@ class BupilicMainApp(ctk.CTk):
         settings.title("⚙️ Ayarlar")
         settings.geometry("500x600")
         settings.transient(self)
+        settings.resizable(False, False)
         
         # Pencereyi ortala
         settings.update_idletasks()
@@ -583,13 +640,25 @@ class BupilicMainApp(ctk.CTk):
         y = self.winfo_y() + (self.winfo_height() - 600) // 2
         settings.geometry(f"+{x}+{y}")
         
+        # Kapanma protokolü - grab_release önemli!
+        def on_close():
+            try:
+                settings.grab_release()
+            except:
+                pass
+            settings.destroy()
+        
+        settings.protocol("WM_DELETE_WINDOW", on_close)
+        
         # grab_set için pencere görünür olana kadar bekle
         def do_grab():
             try:
-                settings.grab_set()
+                if settings.winfo_exists():
+                    settings.grab_set()
+                    settings.focus_force()
             except:
                 pass
-        settings.after(100, do_grab)
+        settings.after(200, do_grab)
         
         # Ana container - basit frame
         main = ctk.CTkFrame(settings, fg_color="transparent")
@@ -711,21 +780,21 @@ class BupilicMainApp(ctk.CTk):
             justify="left"
         ).pack(anchor="w")
         
-        # Kapat butonu
+        # Kapat butonu - on_close kullan
         ctk.CTkButton(
             main,
             text="Kapat",
             width=120,
             height=40,
             corner_radius=20,
-            command=settings.destroy
+            command=on_close
         ).pack(side="bottom", pady=(20, 0))
     
     def _apply_theme(self, theme: str):
         """Tema uygula"""
         ctk.set_appearance_mode(theme.lower())
         self.is_dark_mode = (theme == "Dark")
-        self.theme_btn.configure(text="☀️" if self.is_dark_mode else "🌙")
+        self.theme_btn.configure(text="🌜" if self.is_dark_mode else "🐔")
     
     # =========================================================================
     # MODÜL AÇMA
