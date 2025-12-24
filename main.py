@@ -502,7 +502,7 @@ class BupilicMainApp(ctk.CTk):
         
         # Logo PNG ikon
         try:
-            logo_path = BASE_DIR / "assets" / "icon_logo.png"
+            logo_path = BASE_DIR / "assets" / "tavuk.png"
             if logo_path.exists():
                 logo_pil = Image.open(logo_path)
                 self.logo_image = ctk.CTkImage(
@@ -615,7 +615,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'İskonto Hesaplama',
                 'description': 'PDF fiyat listelerinden otomatik iskonto hesaplama',
-                'icon_path': 'icon_iskonto.png',
+                'icon_path': 'iskonto.png',
                 'accent': MODERN_COLORS['accent_red'],
                 'features': ['Çoklu PDF desteği', 'Kategori bazlı iskonto', 'Excel/PDF export'],
                 'command': self._open_iskonto
@@ -623,7 +623,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Karlılık Analizi',
                 'description': 'Detaylı şube ve ürün karlılık raporları',
-                'icon_path': 'icon_karlilik.png',
+                'icon_path': 'karlilik.png',
                 'accent': MODERN_COLORS['accent_blue'],
                 'features': ['Şube karşılaştırma', 'Zaman analizi', 'Dashboard görünümü'],
                 'command': self._open_karlilik
@@ -631,7 +631,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Müşteri Takip',
                 'description': 'Müşteri kayıp/kazanç analizi ve kontrolü',
-                'icon_path': 'icon_musteri.png',
+                'icon_path': 'musteri.png',
                 'accent': MODERN_COLORS['accent_teal'],
                 'features': ['Dönem karşılaştırma', 'Kayıp müşteri tespiti', 'Trend analizi'],
                 'command': self._open_musteri
@@ -639,7 +639,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Yaşlandırma',
                 'description': 'Cari hesap yaşlandırma ve takip sistemi',
-                'icon_path': 'icon_yaslandirma.png',
+                'icon_path': 'yaslandirma.png',
                 'accent': MODERN_COLORS['accent_orange'],
                 'features': ['Otomatik yaşlandırma', 'Sorumlu atama', 'Detaylı raporlar'],
                 'command': self._open_yaslandirma
