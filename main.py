@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 BUP-ALL-IN-ONE Ana Program
-Tüm modülleri birleştiren modern arayüz - v3.1
+Tüm modülleri birleştiren modern arayüz - v3.3.0
 """
 
 import sys
@@ -15,7 +15,7 @@ import urllib.request
 import json
 
 # Versiyon
-APP_VERSION = "3.3.0"
+APP_VERSION = "3.3.1"
 GITHUB_REPO = "alibedirhan/Bup-Yonetim"
 
 # Path ayarları
@@ -27,6 +27,7 @@ from shared.utils import initialize_app
 logger = initialize_app("BUP_MAIN")
 
 import customtkinter as ctk
+from PIL import Image
 
 # Shared modüller
 from shared.theme import COLORS, MODULE_COLORS, FONTS, SIZES
@@ -122,13 +123,13 @@ MODERN_COLORS = {
 
 
 # =============================================================================
-# MODERN MODÜL KARTI - Tema Destekli
+# MODERN MODÜL KARTI - Tema Destekli + PNG İkon
 # =============================================================================
 
 class ModernModuleCard(ctk.CTkFrame):
-    """Modern tasarımlı modül kartı - Light/Dark tema destekli"""
+    """Modern tasarımlı modül kartı - Light/Dark tema destekli, PNG ikonlu"""
     
-    def __init__(self, master, title: str, description: str, icon: str, 
+    def __init__(self, master, title: str, description: str, icon_path: str, 
                  accent_color: str, features: list, command, **kwargs):
         
         # Boyut ayarları
@@ -149,17 +150,19 @@ class ModernModuleCard(ctk.CTkFrame):
         self.title_text = title
         self.description_text = description
         self.features_list = features
+        self.icon_path = icon_path
         
         # UI elemanları referansları
         self.title_label = None
         self.desc_label = None
         self.feature_labels = []
         self.icon_frame = None
+        self.icon_image = None
         
-        self._setup_ui(title, description, icon, features)
+        self._setup_ui(title, description, icon_path, features)
         self._setup_hover()
     
-    def _setup_ui(self, title: str, description: str, icon: str, features: list):
+    def _setup_ui(self, title: str, description: str, icon_path: str, features: list):
         """UI bileşenlerini oluştur"""
         # Ana container
         self.container = ctk.CTkFrame(self, fg_color="transparent")
@@ -178,10 +181,10 @@ class ModernModuleCard(ctk.CTkFrame):
         content = ctk.CTkFrame(self.container, fg_color="transparent")
         content.pack(fill="both", expand=True, padx=24, pady=24)
         
-        # İkon alanı
+        # İkon alanı - PNG resim
         self.icon_frame = ctk.CTkFrame(
             content,
-            fg_color=self._get_icon_bg_color(),
+            fg_color="transparent",
             corner_radius=16,
             width=70,
             height=70
@@ -189,13 +192,38 @@ class ModernModuleCard(ctk.CTkFrame):
         self.icon_frame.pack(pady=(0, 18))
         self.icon_frame.pack_propagate(False)
         
-        # İkon - Segoe UI Emoji font kullan (Windows emoji desteği)
-        self.icon_label = ctk.CTkLabel(
-            self.icon_frame,
-            text=icon,
-            font=ctk.CTkFont(family="Segoe UI Emoji", size=32),
-            text_color=self.accent_color
-        )
+        # PNG ikon yükle
+        try:
+            icon_full_path = BASE_DIR / "assets" / icon_path
+            if icon_full_path.exists():
+                pil_image = Image.open(icon_full_path)
+                self.icon_image = ctk.CTkImage(
+                    light_image=pil_image,
+                    dark_image=pil_image,
+                    size=(56, 56)
+                )
+                self.icon_label = ctk.CTkLabel(
+                    self.icon_frame,
+                    image=self.icon_image,
+                    text=""
+                )
+            else:
+                # Fallback: Baş harf
+                self.icon_label = ctk.CTkLabel(
+                    self.icon_frame,
+                    text=title[0],
+                    font=ctk.CTkFont(family="Segoe UI", size=32, weight="bold"),
+                    text_color=self.accent_color
+                )
+        except Exception as e:
+            logger.warning(f"İkon yüklenemedi: {e}")
+            self.icon_label = ctk.CTkLabel(
+                self.icon_frame,
+                text=title[0],
+                font=ctk.CTkFont(family="Segoe UI", size=32, weight="bold"),
+                text_color=self.accent_color
+            )
+        
         self.icon_label.place(relx=0.5, rely=0.5, anchor="center")
         
         # Başlık
@@ -472,13 +500,36 @@ class BupilicMainApp(ctk.CTk):
         logo_bg.pack(side="left")
         logo_bg.pack_propagate(False)
         
-        # Logo ikonu - Segoe UI Emoji font (Windows emoji desteği)
-        self.logo_label = ctk.CTkLabel(
-            logo_bg,
-            text="🐔",
-            font=ctk.CTkFont(family="Segoe UI Emoji", size=32),
-            text_color="#FFFFFF"
-        )
+        # Logo PNG ikon
+        try:
+            logo_path = BASE_DIR / "assets" / "icon_logo.png"
+            if logo_path.exists():
+                logo_pil = Image.open(logo_path)
+                self.logo_image = ctk.CTkImage(
+                    light_image=logo_pil,
+                    dark_image=logo_pil,
+                    size=(50, 50)
+                )
+                self.logo_label = ctk.CTkLabel(
+                    logo_bg,
+                    image=self.logo_image,
+                    text=""
+                )
+            else:
+                self.logo_label = ctk.CTkLabel(
+                    logo_bg,
+                    text="B",
+                    font=ctk.CTkFont(family="Segoe UI", size=28, weight="bold"),
+                    text_color="#FFFFFF"
+                )
+        except Exception as e:
+            logger.warning(f"Logo yüklenemedi: {e}")
+            self.logo_label = ctk.CTkLabel(
+                logo_bg,
+                text="B",
+                font=ctk.CTkFont(family="Segoe UI", size=28, weight="bold"),
+                text_color="#FFFFFF"
+            )
         self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
         
         # Başlık metinleri
@@ -559,12 +610,12 @@ class BupilicMainApp(ctk.CTk):
         for i in range(4):
             cards_container.grid_columnconfigure(i, weight=1, uniform="cards")
         
-        # Modül tanımları
+        # Modül tanımları - PNG ikonlar
         modules = [
             {
                 'title': 'İskonto Hesaplama',
                 'description': 'PDF fiyat listelerinden otomatik iskonto hesaplama',
-                'icon': '💰',
+                'icon_path': 'icon_iskonto.png',
                 'accent': MODERN_COLORS['accent_red'],
                 'features': ['Çoklu PDF desteği', 'Kategori bazlı iskonto', 'Excel/PDF export'],
                 'command': self._open_iskonto
@@ -572,7 +623,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Karlılık Analizi',
                 'description': 'Detaylı şube ve ürün karlılık raporları',
-                'icon': '📊',
+                'icon_path': 'icon_karlilik.png',
                 'accent': MODERN_COLORS['accent_blue'],
                 'features': ['Şube karşılaştırma', 'Zaman analizi', 'Dashboard görünümü'],
                 'command': self._open_karlilik
@@ -580,7 +631,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Müşteri Takip',
                 'description': 'Müşteri kayıp/kazanç analizi ve kontrolü',
-                'icon': '👥',
+                'icon_path': 'icon_musteri.png',
                 'accent': MODERN_COLORS['accent_teal'],
                 'features': ['Dönem karşılaştırma', 'Kayıp müşteri tespiti', 'Trend analizi'],
                 'command': self._open_musteri
@@ -588,7 +639,7 @@ class BupilicMainApp(ctk.CTk):
             {
                 'title': 'Yaşlandırma',
                 'description': 'Cari hesap yaşlandırma ve takip sistemi',
-                'icon': '📈',
+                'icon_path': 'icon_yaslandirma.png',
                 'accent': MODERN_COLORS['accent_orange'],
                 'features': ['Otomatik yaşlandırma', 'Sorumlu atama', 'Detaylı raporlar'],
                 'command': self._open_yaslandirma
@@ -602,7 +653,7 @@ class BupilicMainApp(ctk.CTk):
                 cards_container,
                 title=module['title'],
                 description=module['description'],
-                icon=module['icon'],
+                icon_path=module['icon_path'],
                 accent_color=module['accent'],
                 features=module['features'],
                 command=module['command']
