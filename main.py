@@ -189,11 +189,11 @@ class ModernModuleCard(ctk.CTkFrame):
         self.icon_frame.pack(pady=(0, 18))
         self.icon_frame.pack_propagate(False)
         
-        # İkon
+        # İkon - Segoe UI Emoji font kullan (Windows emoji desteği)
         self.icon_label = ctk.CTkLabel(
             self.icon_frame,
             text=icon,
-            font=ctk.CTkFont(size=28),
+            font=ctk.CTkFont(family="Segoe UI Emoji", size=32),
             text_color=self.accent_color
         )
         self.icon_label.place(relx=0.5, rely=0.5, anchor="center")
@@ -465,18 +465,21 @@ class BupilicMainApp(ctk.CTk):
         logo_bg = ctk.CTkFrame(
             left,
             fg_color="#2D4A6F",
-            corner_radius=12,
+            corner_radius=14,
             width=60,
             height=60
         )
         logo_bg.pack(side="left")
         logo_bg.pack_propagate(False)
         
-        ctk.CTkLabel(
+        # Logo ikonu - Segoe UI Emoji font (Windows emoji desteği)
+        self.logo_label = ctk.CTkLabel(
             logo_bg,
             text="🐔",
-            font=ctk.CTkFont(size=28)
-        ).place(relx=0.5, rely=0.5, anchor="center")
+            font=ctk.CTkFont(family="Segoe UI Emoji", size=32),
+            text_color="#FFFFFF"
+        )
+        self.logo_label.place(relx=0.5, rely=0.5, anchor="center")
         
         # Başlık metinleri
         title_frame = ctk.CTkFrame(left, fg_color="transparent")
@@ -811,6 +814,17 @@ class BupilicMainApp(ctk.CTk):
             
             # Ana buton ikonunu güncelle
             self.theme_btn.configure(text="🌜" if self.is_dark_mode else "🐔")
+            
+            # Ayarlar penceresini kapat ve yeniden aç (tema uyumu için)
+            if hasattr(self, '_settings_window') and self._settings_window is not None:
+                try:
+                    if self._settings_window.winfo_exists():
+                        self._settings_window.destroy()
+                        self._settings_window = None
+                        # Kısa gecikme ile yeniden aç
+                        self.after(100, self._create_settings_window)
+                except:
+                    pass
             
             logger.info(f"Tema uygulandı: {theme}")
             
