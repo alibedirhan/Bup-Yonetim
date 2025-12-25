@@ -24,16 +24,28 @@ Tavukçuluk sektörü için modern işletme yönetim sistemi.
 | 👥 Müşteri Takip | Dönem bazlı müşteri karşılaştırma ve trend takibi |
 | 📈 Yaşlandırma | Cari hesap yaşlandırma ve raporlama |
 
-## Arayüz
+## 🖥️ Arayüz
+
+> Görseli tıklayınca tam çözünürlükte açılır.
 
 <p align="center">
-  <img src="docs/media/ui.png" alt="BUP-YONETIM arayüz" width="900">
+  <a href="https://raw.githubusercontent.com/alibedirhan/Bup-Yonetim/main/docs/media/ui%402x.png">
+    <img src="https://raw.githubusercontent.com/alibedirhan/Bup-Yonetim/main/docs/media/ui%402x.png" alt="BUP-YONETIM arayüz" width="900">
+  </a>
 </p>
 
-## Kısa Demo
+## 🎬 Demo
+
+> GIF önizlemedir. Tam kalite video için görsele tıklayın.
 
 <p align="center">
-  <img src="docs/media/demo.gif" alt="BUP-YONETIM demo" width="900">
+  <a href="https://raw.githubusercontent.com/alibedirhan/Bup-Yonetim/main/docs/media/demo_1280.mp4">
+    <img src="https://raw.githubusercontent.com/alibedirhan/Bup-Yonetim/main/docs/media/demo.gif" alt="BUP-YONETIM demo (GIF)" width="900">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/alibedirhan/Bup-Yonetim/main/docs/media/demo_1280.mp4"><b>▶ Tam kalite video (MP4)</b></a>
 </p>
 
 
